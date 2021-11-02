@@ -24,6 +24,91 @@ app.use(session({
 
 mongoose.connect('mongodb://localhost:27017/userDB',{useNewUrlParser:true, useUnifiedTopology: true });
 
+const studentSchema = new mongoose.Schema({
+  name:{
+    type: String,
+    required: true
+  },
+  email:{
+    type: String,
+    required: true
+  },
+  contact:{
+    type: String,
+    required: true
+  },
+  year:{
+    type: String,
+    required: true
+  },
+  roll:{
+    type: String,
+    required: true
+  },
+  subjects:{
+    type: String,
+    "default" : [],
+    required: true
+  }
+});
+
+const teacherSchema = new mongoose.Schema({
+  name:{
+    type: String,
+    required: true
+  },
+  email:{
+    type: String,
+    required: true
+  },
+  contact:{
+    type: String,
+    required: true
+  },
+  subjects:{
+    type: String,
+    required: true
+  }
+});
+
+const subjectSchema = new mongoose.Schema({
+  name:{
+    type: String,
+    required: true
+  },
+  time:{
+    type: String,
+    required: true
+  },
+  days:{
+    type: String,
+    "default" : [],
+    required: true
+  }
+});
+
+const assignmentSchema = new mongoose.Schema({
+  teacherName:{
+    type: String,
+    required: true
+  },
+  subjectName:{
+    type: String,
+    required: true
+  },
+  question:{
+    type: String,
+    required: true
+  },
+  deadline:{
+    time:{
+      startTime: Date,
+      endTime: Date,
+    },
+    required: true
+  }
+});
+
 const userSchema = new mongoose.Schema({
   email: String,
   password: String,
