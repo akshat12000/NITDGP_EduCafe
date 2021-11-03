@@ -135,6 +135,14 @@ app.get("/", function (req, res) {
   res.render("home");
 });
 
+app.get("/student/EduCafe", function(req, res){
+  res.render("studentEduCafe");
+});
+
+app.get("/teacher/EduCafe", function(req, res){
+  res.render("teacherEduCafe");
+});
+
 app.get("/student", function (req, res) {
   res.render("studentSubhome");
 });
@@ -144,32 +152,37 @@ app.get("/teacher", function (req, res) {
 });
 
 app.get("/student/login", function (req, res) {
-  res.render("student_login");
+  res.render("studentLogin");
 });
 
 app.get("/student/register", function (req, res) {
-  res.render("student_register");
+  res.render("studentRegister");
 });
 
 app.get("/teacher/login", function (req, res) {
-  res.render("teacher_login");
+  res.render("teacherLogin");
 });
 
 app.get("/teacher/register", function (req, res) {
-  res.render("teacher_register");
+  res.render("teacherRegister");
 });
 
 app.post("/student/register", function (req, res) {
   bcrypt.hash(req.body.password, saltRounds, function (err, hash) {
     student = new Student({
+      name: req.body.name,
       email: req.body.username,
-      password: hash
+      password: hash,
+      contact: req.body.contact,
+      year: req.body.year,
+      roll: req.body.roll,
+      subjects: req.body.subjects,
     });
     student.save(function (err) {
       if (err) {
         console.log(err);
       } else {
-        res.render("secrets");
+        res.redirect("/student/EduCafe");
       }
     });
   });
@@ -177,19 +190,23 @@ app.post("/student/register", function (req, res) {
 
 app.post("/teacher/register", function (req, res) {
   bcrypt.hash(req.body.password, saltRounds, function (err, hash) {
-    teacher = new Tecaher({
+    teacher = new Teacher({
+      name: req.body.name,
       email: req.body.username,
-      password: hash
+      password: hash,
+      contact: req.body.contact,
+      subjects: req.body.subjects,
     });
     teacher.save(function (err) {
       if (err) {
         console.log(err);
       } else {
-        res.render("secrets");
+        res.redirect("/teacher/EduCafe");
       }
     });
   });
 });
+
 
 app.get("/student/logout", function (req, res) {
   req.logout();
@@ -211,8 +228,10 @@ app.post("/student/login", function (req, res) {
     } else {
       if (foundStudent) {
         bcrypt.compare(password, foundStudent.password, function (err, result) {
-          if (result) {
-            res.render("secrets");
+          if (!err) {
+            res.redirect("/student/EduCafe");
+          }else{
+            console.log(err);
           }
         });
       }
@@ -230,8 +249,10 @@ app.post("/teacher/login", function (req, res) {
     } else {
       if (foundTeacher) {
         bcrypt.compare(password, foundTeacher.password, function (err, result) {
-          if (result) {
-            res.render("secrets");
+          if (!err) {
+            res.redirect("/teacher/EduCafe");
+          }else{
+            console.log(err);
           }
         });
       }
