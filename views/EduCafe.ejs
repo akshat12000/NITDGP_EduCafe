@@ -1,74 +1,64 @@
-<!DOCTYPE html>
-<html lang="en">
+<%- include("partials/headerMain.ejs"); -%>
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&family=Montserrat:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&display=swap"
-        rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <link rel="stylesheet" href="/css/main.css">
-    <title>GatherUp!</title>
-</head>
-
-<body>
-    <!--- This is the overlay div when it will be active when we will toggle the navbar in mobile device --->
-    <div class="overlay againdisp">
-    </div>
-    <!--- This the Nav Bar --->
-    <div class="main-content">
-        <div class="navbar active">
-            <!--- This is the NavBar Brand saying "GatherUp!" --->
-            <div class="nav-brand">
-                <h1>EduCafe</h1> <span class="mycross fa fa-times againdisp"></span>
-            </div>
-            <!--- Nav Items --->
-            <div class="nav-items">
-                <ul>
-                    <li><a href="/"><i class="fa fa-bar-chart-o menu"></i>Overview</a></li>
-                    <li class="menu-cou"><a href="#"><i class="fa fa-folder-o menu-cou-li"></i>Courses</a></li>
-                    <li><a href="/Schedule"><i class="fa fa-calendar menu"></i> Schedule</a></li>
-                    <li><a href="#"><i class="fa fa-book menu"></i>Materials</a></li>
-                    <li class="menu-ex"><a href="#"><i class="fa fa-bookmark-o menu-ex-li"></i>Exams</a></li>
-                    <li class="menu-se"><a href="#"><i class="fa fa-gear menu-se-li"></i>Settings</a></li>
-                </ul>
-            </div>
-            <!--- Log out Option --->
-            <div class="nav-log-out">
-                <a href="#"><i class="fa fa-sign-out log-li"></i>Log out</a>
-            </div>
+    <body>
+        <!--- This is the overlay div when it will be active when we will toggle the navbar in mobile device --->
+        <div class="overlay againdisp">
         </div>
-        <!--- This is the hamburger symbol and it will be active once viewed in mobile device --->
-        <div class="hamburger">
-            <span id="ham" class="fa fa-bars"></span>
-        </div>
-        <div class="content">
-            <div class="flex-container">
-                <!--- Creating the Search Bar --->
-                <div class="search-bar">
-                    <form class="form-container" action="index.html" method="post">
-                        <input type="text" name="search" value="" placeholder="Search course, lecture, exam..." autocomplete="off">
-                        <button class="search-icon fa fa-search" type="submit" name="button"></button>
-                    </form>
+        <!--- This the Nav Bar --->
+        <div class="main-content">
+            <div class="navbar active">
+                <!--- This is the NavBar Brand saying "GatherUp!" --->
+                <div class="nav-brand">
+                    <h1>EduCafé</h1> <span class="mycross fa fa-times againdisp"></span>
                 </div>
-                <!--- Notification and User Icons --->
-                <div class="user-disp">
-                    <a href="#" class="fa fa-bell-o bell-icon"></a>&nbsp;&nbsp&nbsp;
-                    <a href="#" class="fa fa-user-circle user-icon"></a>
+                <!--- Nav Items --->
+                <div class="nav-items">
+                    <% if(designation==="student"){%>
+                        <ul>
+                            <li><a href="/student/EduCafe/overview"><i class="fa fa-bar-chart-o menu"></i>Overview</a></li>
+                            <li class="menu-cou"><a href="#"><i class="fa fa-folder-o menu-cou-li"></i>Courses</a></li>
+                            <li><a href="/student/EduCafe/schedule"><i class="fa fa-calendar menu"></i> Schedule</a></li>
+                            <li><a href="#"><i class="fa fa-book menu"></i>Materials</a></li>
+                            <li class="menu-ex"><a href="/student/EduCafe/assignments"><i class="fa fa-bookmark-o menu-ex-li"></i>Assignments</a></li>
+                        </ul>
+                        <%}%>
+                            <% if(designation==="teacher"){%>
+                                <ul>
+                                    <li><a href="/teacher/EduCafe/overview"><i class="fa fa-bar-chart-o menu"></i>Overview</a></li>
+                                    <li><a href="/teacher/EduCafe/schedule"><i class="fa fa-calendar menu"></i> Schedule</a></li>
+                                    <li class="menu-ex"><a href="/teacher/EduCafe/assignments"><i class="fa fa-bookmark-o menu-ex-li"></i>Assignments</a></li>
+                                </ul>
+                                <%}%>
+                </div>
+                <!--- Log out Option --->
+                <div class="nav-log-out">
+                    <% if(designation==="student"){%>
+                        <a href="/student/logout"><i class="fa fa-sign-out log-li"></i>Log out</a>
+                        <%}%>
+                            <% if(designation==="teacher"){%>
+                                <a href="/teacher/logout"><i class="fa fa-sign-out log-li"></i>Log out</a>
+                                <%}%>
                 </div>
             </div>
+            <!--- This is the hamburger symbol and it will be active once viewed in mobile device --->
+            <div class="hamburger">
+                <span id="ham" class="fa fa-bars"></span>
+            </div>
+            <div class="content">
+                <div class="flex-container">
+                    <!--- Creating the Search Bar --->
+                    <div class="search-bar">
+                        <form class="form-container" action="index.html" method="post">
+                            <input type="text" name="search" value="" placeholder="Search course, lecture, exam..." autocomplete="off">
+                            <button class="search-icon fa fa-search" type="submit" name="button"></button>
+                        </form>
+                    </div>
+                    <!--- Notification and User Icons --->
+                    <div class="user-disp">
+                        <a href="#" class="fa fa-bell-o bell-icon"></a>&nbsp;&nbsp&nbsp;
+                        <a href="#" class="fa fa-user-circle user-icon"></a>
+                    </div>
+                </div>
+            </div>
         </div>
-    </div>
-    <!--- Footer Part --->
-    <footer>
-        <div class="ending">
-            <i style="color:#f4f4f4; background-color:#8a658f;" class="fa fa-copyright"></i> EduCafe 2021
-        </div>
-    </footer>
-</body>
-<script src="/js/index.js" charset="utf-8"></script>
-
-</html>
+        <%- include("partials/footerMain.ejs"); -%>

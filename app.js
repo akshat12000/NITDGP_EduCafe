@@ -144,11 +144,11 @@ app.get("/teacher", function(req, res) {
 });
 
 app.get("/student/EduCafe", function(req, res) {
-    res.render("EduCafe");
+    res.render("EduCafe", { designation: "student" });
 });
 
 app.get("/teacher/EduCafe", function(req, res) {
-    res.render("EduCafe");
+    res.render("EduCafe", { designation: "teacher" });
 });
 
 app.get("/student/login", function(req, res) {

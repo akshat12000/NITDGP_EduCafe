@@ -22,8 +22,8 @@ li a {
     color: #8a658f;
     display: inline-block;
     text-decoration: none;
-    padding: 3% 1.5%;
-    width: 70%;
+    padding: 3% 1%;
+    width: 75%;
 }
 
 li a:hover {
@@ -55,7 +55,7 @@ li a:hover {
 }
 
 .menu-ex a {
-    padding-right: 1.3rem;
+    padding-left: 1.3rem;
 }
 
 .menu-ex-li {
