@@ -136,17 +136,12 @@ app.get("/", function (req, res) {
 });
 
 app.get("/student", function (req, res) {
-  res.render("subhome", {
-    designation: "student",    
-  });
+  res.render("studentSubhome");
 });
 
 app.get("/teacher", function (req, res) {
-  res.render("subhome", {
-    designation: "teacher",    
-  });
+  res.render("teacherSubhome");
 });
-
 
 app.get("/student/login", function (req, res) {
   res.render("student_login");
