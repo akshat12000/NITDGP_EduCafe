@@ -209,12 +209,12 @@ app.post("/teacher/register", function(req, res) {
 
 
 app.get("/student/logout", function(req, res) {
-    req.logout();
+    //req.logout();
     res.redirect("/");
 });
 
 app.get("/teacher/logout", function(req, res) {
-    req.logout();
+    //req.logout();
     res.redirect("/");
 });
 
