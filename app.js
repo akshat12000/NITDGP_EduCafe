@@ -107,20 +107,18 @@ const assignmentSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    class:{
+        type: String,
+        required: true
+    },
     question: {
         type: String,
         required: true
     },
-    deadline: {
-        startTime: {
-            type: Date,
-            required: true
-        },
-        endTime: {
-            type: Date,
-            required: true
-        },
-    }
+    endTime: {
+        type: Date,
+        required: true
+    },
 });
 
 studentSchema.plugin(findOrCreate);
@@ -241,7 +239,7 @@ app.get("/teacher/logout", function(req, res) {
 app.post("/student/login", function(req, res) {
     const username = req.body.username;
     const password = req.body.password;
-
+    
     Student.findOne({ email: username }, function(err, foundStudent) {
         if (err) {
             console.log(err);
@@ -262,7 +260,7 @@ app.post("/student/login", function(req, res) {
 app.post("/teacher/login", function(req, res) {
     const username = req.body.username;
     const password = req.body.password;
-
+    
     Teacher.findOne({ email: username }, function(err, foundTeacher) {
         if (err) {
             console.log(err);
@@ -280,6 +278,19 @@ app.post("/teacher/login", function(req, res) {
     });
 });
 
+app.get("/student/Educafe/assignments",(req,res)=>{
+    res.render("assignments_stu",{designation:"student"});
+});
+
+app.get("/teacher/Educafe/assignments",(req,res)=>{
+    res.render("assignments_teach",{designation:"teacher"});
+});
+
+app.get("/teacher/Educafe/assignments/new",(req,res)=>{
+    res.render("assignment_new",{designation:"teacher"});
+});
+
 app.listen(3000, function(req, res) {
     console.log("The server is running at port 3000");
 });
+
