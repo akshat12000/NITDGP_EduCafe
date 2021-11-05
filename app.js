@@ -24,6 +24,29 @@ app.use(session({
 
 mongoose.connect('mongodb://' + process.env.DB_USERNAME + ':' + process.env.DB_PASSWORD + '@dbaas253.hyperp-dbaas.cloud.ibm.com:30055,dbaas254.hyperp-dbaas.cloud.ibm.com:30906,dbaas255.hyperp-dbaas.cloud.ibm.com:30666/admin?replicaSet=IBM', { useNewUrlParser: true, useUnifiedTopology: true, ssl: true, sslValidate: true, sslCA: process.env.CERTI_FILE });
 
+const subjectSchema = new mongoose.Schema({
+    name: {
+        type: String,
+        required: true
+    },
+    time: {
+        type: String,
+        required: true
+    },
+    days: {
+        type: String,
+        "default": [],
+        required: true
+    }
+});
+
+// const subjectlistSchema = new mongoose.Schema({
+//     name: {
+//         type: String,
+//         required: true
+//     }
+// });
+
 const studentSchema = new mongoose.Schema({
     name: {
         type: String,
@@ -49,11 +72,7 @@ const studentSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    subjects: {
-        type: String,
-        "default": [],
-        required: true
-    }
+    subjects: [{type: String}],
 });
 
 const teacherSchema = new mongoose.Schema({
@@ -75,22 +94,6 @@ const teacherSchema = new mongoose.Schema({
     },
     subjects: {
         type: String,
-        required: true
-    }
-});
-
-const subjectSchema = new mongoose.Schema({
-    name: {
-        type: String,
-        required: true
-    },
-    time: {
-        type: String,
-        required: true
-    },
-    days: {
-        type: String,
-        "default": [],
         required: true
     }
 });
@@ -156,6 +159,7 @@ app.get("/student/login", function(req, res) {
 });
 
 app.get("/student/register", function(req, res) {
+    subjects = [];
     res.render("register", { designation: "student" });
 });
 
@@ -168,6 +172,22 @@ app.get("/teacher/register", function(req, res) {
 });
 
 app.post("/student/register", function(req, res) {
+    var sub=[];
+    var st=req.body.subjects;
+    var pst="";
+    for(var i=0;i<st.length;i++)
+    {
+        if(st[i]!=","){
+            pst+=st[i];
+        }
+        else{
+            sub.push(pst);
+            pst="";
+        }
+    }
+    if(pst.length){
+        sub.push(pst);
+    }
     bcrypt.hash(req.body.password, saltRounds, function(err, hash) {
         student = new Student({
             name: req.body.name,
@@ -176,7 +196,7 @@ app.post("/student/register", function(req, res) {
             contact: req.body.contact,
             year: req.body.year,
             roll: req.body.roll,
-            subjects: req.body.subjects,
+            subjects: sub,
         });
         student.save(function(err) {
             if (err) {
