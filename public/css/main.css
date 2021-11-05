@@ -225,3 +225,36 @@ li {
         font-size: 94%;
     }
 }
+* {
+  padding: 0;
+  margin: 0;
+}
+
+.container {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  height: 100vh;
+  flex-wrap: no-wrap;
+}
+
+.container div {
+  width: 50%;
+  height: 200px;
+}
+
+.picture {
+  background: #4451c2;
+}
+
+.text {
+  background: #f451c2;
+}
+
+@media (max-width: 600px) {
+  .container {
+    flex-direction: column;
+  }
+  .container div {
+    width: 100%;
+  }

@@ -5,24 +5,44 @@ const bodyParser = require("body-parser");
 const ejs = require("ejs");
 const mongoose = require("mongoose");
 const session = require("express-session");
+const MongoDBStore = require('connect-mongodb-session')(session);
 const findOrCreate = require("mongoose-findorcreate");
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
 
+
 const app = express();
+
+const store = new MongoDBStore({
+    uri: 'mongodb://' + process.env.DB_USERNAME + ':' + process.env.DB_PASSWORD + '@dbaas253.hyperp-dbaas.cloud.ibm.com:30055,dbaas254.hyperp-dbaas.cloud.ibm.com:30906,dbaas255.hyperp-dbaas.cloud.ibm.com:30666/admin?replicaSet=IBM',
+    collection: 'mySessions',
+  
+    connectionOptions: {
+        useNewUrlParser: true, 
+        useUnifiedTopology: true, ssl: true, sslValidate: true, sslCA: process.env.CERTI_FILE
+    }
+  });
+
 
 app.set('view engine', 'ejs');
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static("public"));
 
+store.on('error', function(error) {
+    console.log(error);
+  });
+
 app.use(session({
     secret: "Our little Secret.",
-    resave: false,
-    saveUninitialized: false
+    resave: true,
+    saveUninitialized: true,
+    store: store
 }));
 
 mongoose.connect('mongodb://' + process.env.DB_USERNAME + ':' + process.env.DB_PASSWORD + '@dbaas253.hyperp-dbaas.cloud.ibm.com:30055,dbaas254.hyperp-dbaas.cloud.ibm.com:30906,dbaas255.hyperp-dbaas.cloud.ibm.com:30666/admin?replicaSet=IBM', { useNewUrlParser: true, useUnifiedTopology: true, ssl: true, sslValidate: true, sslCA: process.env.CERTI_FILE });
+
+
 
 const subjectSchema = new mongoose.Schema({
     name: {
@@ -92,13 +112,17 @@ const teacherSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    subjects: {
+    subject: {
         type: String,
         required: true
     }
 });
 
 const assignmentSchema = new mongoose.Schema({
+    teacherId: {
+        type: String,
+        required: true
+    },
     teacherName: {
         type: String,
         required: true
@@ -107,7 +131,7 @@ const assignmentSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    class:{
+    year:{
         type: String,
         required: true
     },
@@ -170,22 +194,6 @@ app.get("/teacher/register", function(req, res) {
 });
 
 app.post("/student/register", function(req, res) {
-    var sub=[];
-    var st=req.body.subjects;
-    var pst="";
-    for(var i=0;i<st.length;i++)
-    {
-        if(st[i]!=","){
-            pst+=st[i];
-        }
-        else{
-            sub.push(pst);
-            pst="";
-        }
-    }
-    if(pst.length){
-        sub.push(pst);
-    }
     bcrypt.hash(req.body.password, saltRounds, function(err, hash) {
         student = new Student({
             name: req.body.name,
@@ -194,13 +202,13 @@ app.post("/student/register", function(req, res) {
             contact: req.body.contact,
             year: req.body.year,
             roll: req.body.roll,
-            subjects: sub,
+            subjects: req.body.subjects,
         });
         student.save(function(err) {
             if (err) {
                 console.log(err);
             } else {
-                res.redirect("/student/EduCafe");
+                res.redirect("/student");
             }
         });
     });
@@ -213,13 +221,13 @@ app.post("/teacher/register", function(req, res) {
             email: req.body.username,
             password: hash,
             contact: req.body.contact,
-            subjects: req.body.subjects,
+            subject: req.body.subjects,
         });
         teacher.save(function(err) {
             if (err) {
                 console.log(err);
             } else {
-                res.redirect("/teacher/EduCafe");
+                res.redirect("/teacher");
             }
         });
     });
@@ -247,6 +255,8 @@ app.post("/student/login", function(req, res) {
             if (foundStudent) {
                 bcrypt.compare(password, foundStudent.password, function(err, result) {
                     if (!err) {
+                        req.session.user = foundStudent;
+                        req.session.save()
                         res.redirect("/student/EduCafe");
                     } else {
                         console.log(err);
@@ -268,6 +278,8 @@ app.post("/teacher/login", function(req, res) {
             if (foundTeacher) {
                 bcrypt.compare(password, foundTeacher.password, function(err, result) {
                     if (!err) {
+                        req.session.user = foundTeacher;
+                         req.session.save();
                         res.redirect("/teacher/EduCafe");
                     } else {
                         console.log(err);
@@ -283,13 +295,38 @@ app.get("/student/Educafe/assignments",(req,res)=>{
 });
 
 app.get("/teacher/Educafe/assignments",(req,res)=>{
-    res.render("assignments_teach",{designation:"teacher"});
+    const teacherId = req.session.user._id;
+    Assignment.find({teacherId:teacherId},(err,foundAssignments)=>{
+        if(err){
+            console.log(err);
+        }else{
+            res.render("assignments_teach",{designation:"teacher",assignments:foundAssignments});
+        }
+    });
+    
 });
 
 app.get("/teacher/Educafe/assignments/new",(req,res)=>{
+    const nt=req.session.user._id;
     res.render("assignment_new",{designation:"teacher"});
 });
-
+app.post("/teacher/Educafe/assignments/new",(req,res)=>{
+    const newAssignment = new Assignment({
+        teacherId: req.session.user._id,
+        teacherName: req.body.teacherName,
+        subjectName: req.body.subjectName,
+        year: req.body.year,
+        question: req.body.question,
+        endTime: req.body.endTime,
+    });
+    newAssignment.save(function(err){
+        if(err){
+            console.log(err);
+        }else{
+            res.redirect("/teacher/Educafe/assignments");
+        }
+    });
+});
 app.listen(3000, function(req, res) {
     console.log("The server is running at port 3000");
 });
