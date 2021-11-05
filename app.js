@@ -172,22 +172,7 @@ app.get("/teacher/register", function(req, res) {
 });
 
 app.post("/student/register", function(req, res) {
-    var sub=[];
-    var st=req.body.subjects;
-    var pst="";
-    for(var i=0;i<st.length;i++)
-    {
-        if(st[i]!=","){
-            pst+=st[i];
-        }
-        else{
-            sub.push(pst);
-            pst="";
-        }
-    }
-    if(pst.length){
-        sub.push(pst);
-    }
+    console.log(req.body);
     bcrypt.hash(req.body.password, saltRounds, function(err, hash) {
         student = new Student({
             name: req.body.name,
@@ -196,7 +181,7 @@ app.post("/student/register", function(req, res) {
             contact: req.body.contact,
             year: req.body.year,
             roll: req.body.roll,
-            subjects: sub,
+            subjects: req.body.subjects,
         });
         student.save(function(err) {
             if (err) {

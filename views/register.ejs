@@ -35,8 +35,17 @@
                                     <input type="roll" class="form-control" name="roll">
                                 </div>
                                 <div class="form-group">
-                                    <label for="subjects">Subjects (Separated by commas)</label>
-                                    <input type="subjects" class="form-control" name="subjects">                                    
+                                    <label for="subjects">Subjects</label><br>
+                                    <input type="checkbox" id="sub1" name="subjects" value="Physics">
+                                    <label for="sub1">Physics</label><br>
+                                    <input type="checkbox" id="sub2" name="subjects" value="Chemistry">
+                                    <label for="sub2">Chemistry</label><br>
+                                    <input type="checkbox" id="sub3" name="subjects" value="Maths">
+                                    <label for="sub3">Maths</label><br>
+                                    <input type="checkbox" id="sub4" name="subjects" value="Biology">
+                                    <label for="sub4">Biology</label><br>
+                                    <input type="checkbox" id="sub5" name="subjects" value="Computer">
+                                    <label for="sub5">Computer</label><br>
                                 </div>
                                 <button type="submit" class="btn btn-dark">Register</button>
                             </form>
@@ -71,5 +80,7 @@
             </div>
         </div>
     </div>
+
+    <script src="app.js"></script>
 
     <%- include('partials/header') %>
