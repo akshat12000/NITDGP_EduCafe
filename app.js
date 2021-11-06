@@ -5,44 +5,28 @@ const bodyParser = require("body-parser");
 const ejs = require("ejs");
 const mongoose = require("mongoose");
 const session = require("express-session");
-const MongoDBStore = require('connect-mongodb-session')(session);
 const findOrCreate = require("mongoose-findorcreate");
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
 
-
 const app = express();
-
-const store = new MongoDBStore({
-    uri: 'mongodb://' + process.env.DB_USERNAME + ':' + process.env.DB_PASSWORD + '@dbaas253.hyperp-dbaas.cloud.ibm.com:30055,dbaas254.hyperp-dbaas.cloud.ibm.com:30906,dbaas255.hyperp-dbaas.cloud.ibm.com:30666/admin?replicaSet=IBM',
-    collection: 'mySessions',
-  
-    connectionOptions: {
-        useNewUrlParser: true, 
-        useUnifiedTopology: true, ssl: true, sslValidate: true, sslCA: process.env.CERTI_FILE
-    }
-  });
-
 
 app.set('view engine', 'ejs');
 
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(express.static("public"));
+// app.use(bodyParser.json());
+// app.use(bodyParser.urlencoded({ extended: true }));
 
-store.on('error', function(error) {
-    console.log(error);
-  });
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
+app.use(express.static("public"));
 
 app.use(session({
     secret: "Our little Secret.",
-    resave: true,
-    saveUninitialized: true,
-    store: store
+    resave: false,
+    saveUninitialized: false
 }));
 
 mongoose.connect('mongodb://' + process.env.DB_USERNAME + ':' + process.env.DB_PASSWORD + '@dbaas253.hyperp-dbaas.cloud.ibm.com:30055,dbaas254.hyperp-dbaas.cloud.ibm.com:30906,dbaas255.hyperp-dbaas.cloud.ibm.com:30666/admin?replicaSet=IBM', { useNewUrlParser: true, useUnifiedTopology: true, ssl: true, sslValidate: true, sslCA: process.env.CERTI_FILE });
-
-
 
 const subjectSchema = new mongoose.Schema({
     name: {
@@ -92,7 +76,7 @@ const studentSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    subjects: [{type: String}],
+    subjects: [{ type: String }],
 });
 
 const teacherSchema = new mongoose.Schema({
@@ -112,7 +96,7 @@ const teacherSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    subject: {
+    subjects: {
         type: String,
         required: true
     }
@@ -131,7 +115,7 @@ const assignmentSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    year:{
+    year: {
         type: String,
         required: true
     },
@@ -165,15 +149,22 @@ app.get("/student", function(req, res) {
 });
 
 app.get("/teacher", function(req, res) {
+
     res.render("subHome", { designation: "teacher" });
 });
 
 app.get("/student/EduCafe", function(req, res) {
-    res.render("EduCafe", { designation: "student" });
+    var date = new Date().getDate();
+    var today = new Date();
+    var month = today.toLocaleString('default', { month: 'short' });
+    res.render("EduCafe", { designation: "student", date: date, month: month });
 });
 
 app.get("/teacher/EduCafe", function(req, res) {
-    res.render("EduCafe", { designation: "teacher" });
+    var date = new Date().getDate();
+    var today = new Date();
+    var month = today.toLocaleString('default', { month: 'short' });
+    res.render("EduCafe", { designation: "teacher", date: date, month: month });
 });
 
 app.get("/student/login", function(req, res) {
@@ -194,6 +185,7 @@ app.get("/teacher/register", function(req, res) {
 });
 
 app.post("/student/register", function(req, res) {
+    console.log(req.body);
     bcrypt.hash(req.body.password, saltRounds, function(err, hash) {
         student = new Student({
             name: req.body.name,
@@ -208,7 +200,7 @@ app.post("/student/register", function(req, res) {
             if (err) {
                 console.log(err);
             } else {
-                res.redirect("/student");
+                res.redirect("/student/login");
             }
         });
     });
@@ -221,13 +213,13 @@ app.post("/teacher/register", function(req, res) {
             email: req.body.username,
             password: hash,
             contact: req.body.contact,
-            subject: req.body.subjects,
+            subjects: req.body.subjects,
         });
         teacher.save(function(err) {
             if (err) {
                 console.log(err);
             } else {
-                res.redirect("/teacher");
+                res.redirect("/teacher/login");
             }
         });
     });
@@ -247,7 +239,7 @@ app.get("/teacher/logout", function(req, res) {
 app.post("/student/login", function(req, res) {
     const username = req.body.username;
     const password = req.body.password;
-    
+
     Student.findOne({ email: username }, function(err, foundStudent) {
         if (err) {
             console.log(err);
@@ -270,7 +262,7 @@ app.post("/student/login", function(req, res) {
 app.post("/teacher/login", function(req, res) {
     const username = req.body.username;
     const password = req.body.password;
-    
+
     Teacher.findOne({ email: username }, function(err, foundTeacher) {
         if (err) {
             console.log(err);
@@ -279,7 +271,7 @@ app.post("/teacher/login", function(req, res) {
                 bcrypt.compare(password, foundTeacher.password, function(err, result) {
                     if (!err) {
                         req.session.user = foundTeacher;
-                         req.session.save();
+                        req.session.save();
                         res.redirect("/teacher/EduCafe");
                     } else {
                         console.log(err);
@@ -290,27 +282,26 @@ app.post("/teacher/login", function(req, res) {
     });
 });
 
-app.get("/student/Educafe/assignments",(req,res)=>{
-    res.render("assignments_stu",{designation:"student"});
+app.get("/student/Educafe/assignments", (req, res) => {
+    res.render("assignments_stu", { designation: "student" });
 });
 
-app.get("/teacher/Educafe/assignments",(req,res)=>{
+app.get("/teacher/Educafe/assignments", (req, res) => {
     const teacherId = req.session.user._id;
-    Assignment.find({teacherId:teacherId},(err,foundAssignments)=>{
-        if(err){
+    Assignment.find({ teacherId: teacherId }, (err, foundAssignments) => {
+        if (err) {
             console.log(err);
-        }else{
-            res.render("assignments_teach",{designation:"teacher",assignments:foundAssignments});
+        } else {
+            res.render("assignments_teach", { designation: "teacher", assignments: foundAssignments });
         }
     });
-    
 });
 
-app.get("/teacher/Educafe/assignments/new",(req,res)=>{
-    const nt=req.session.user._id;
-    res.render("assignment_new",{designation:"teacher"});
+app.get("/teacher/Educafe/assignments/new", (req, res) => {
+    const nt = req.session.user._id;
+    res.render("assignment_new", { designation: "teacher" });
 });
-app.post("/teacher/Educafe/assignments/new",(req,res)=>{
+app.post("/teacher/Educafe/assignments/new", (req, res) => {
     const newAssignment = new Assignment({
         teacherId: req.session.user._id,
         teacherName: req.body.teacherName,
@@ -319,15 +310,15 @@ app.post("/teacher/Educafe/assignments/new",(req,res)=>{
         question: req.body.question,
         endTime: req.body.endTime,
     });
-    newAssignment.save(function(err){
-        if(err){
+    newAssignment.save(function(err) {
+        if (err) {
             console.log(err);
-        }else{
+        } else {
             res.redirect("/teacher/Educafe/assignments");
         }
     });
 });
+
 app.listen(3000, function(req, res) {
     console.log("The server is running at port 3000");
 });
-
