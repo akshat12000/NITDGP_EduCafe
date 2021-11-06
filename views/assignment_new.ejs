@@ -93,7 +93,7 @@
                                 <a href="#" class="fa fa-user-circle user-icon"></a>
                 </div>
             </div>
-            <form action="/teacher/Educafe/assignments/new" method="POST">
+            <form class="assignment-form" action="/teacher/Educafe/assignments/new" method="POST">
                 <div class="form-group">
                     <label for="string">Teacher Name</label>
                     <input type="string" class="form-control" name="teacherName" />
@@ -113,16 +113,16 @@
                 </div>
                 <div class="form-group">
                     <label for="subjectName">Choose the Subject</label>
-                    <select id="subjectName" name="subjectName">
-            <option value="Physics">Physics</option>
-            <option value="Maths">Maths</option>
-            <option value="Chemistry">Chemistry</option>
-            <option value="Biology">Biology</option>
-            <option value="Computer">Computer</option>
-            <option value="Physical Education">Physical Education</option>
-          </select>
+                    <select id="subjectName" name="subjectName" style="max-width: 6vw; margin-right:41%;">
+                      <option value="Physics">Physics</option>
+                      <option value="Maths">Maths</option>
+                      <option value="Chemistry">Chemistry</option>
+                      <option value="Biology">Biology</option>
+                      <option value="Computer">Computer</option>
+                      <option value="Physical Education">Physical Education</option>
+                    </select>
                 </div>
-                <button type="submit" class="btn btn-dark">Register</button>
+                <button type="submit" id="reg-btn">Register</button>
             </form>
         </div>
         </div>

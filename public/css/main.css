@@ -278,3 +278,39 @@ li {
     padding: 0.5%;
     margin-left: 1%;
 }
+
+.assignment-form {
+    padding: 1%;
+    margin: 1%;
+}
+
+.form-group {
+    width: 60%;
+    display: flex;
+    margin: 2% auto;
+}
+
+.form-group label {
+    flex: 0%;
+    font-weight: bold;
+}
+
+.form-group input {
+    flex: 10%;
+}
+
+#reg-btn {
+    background-color: #f4f4f4;
+    color: #8a658f;
+    font-size: 1rem;
+    display: block;
+    margin: 2% auto;
+    border: 1px solid #8a658f;
+    border-radius: 5px;
+    padding: 1% 2%;
+}
+
+#reg-btn:hover {
+    background-color: #8a658f;
+    color: #f4f4f4;
+}
