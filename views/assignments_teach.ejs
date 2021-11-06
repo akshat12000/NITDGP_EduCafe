@@ -16,7 +16,6 @@
                     <% if(designation==="student"){%>
                         <ul>
                             <li><a href="/student/EduCafe/overview"><i class="fa fa-bar-chart-o menu"></i>Overview</a></li>
-                            <li class="menu-cou"><a href="#"><i class="fa fa-folder-o menu-cou-li"></i>Courses</a></li>
                             <li><a href="/student/EduCafe/schedule"><i class="fa fa-calendar menu"></i> Schedule</a></li>
                             <li><a href="#"><i class="fa fa-book menu"></i>Materials</a></li>
                             <li class="menu-ex"><a href="/student/EduCafe/assignments"><i class="fa fa-bookmark-o menu-ex-li"></i>Assignments</a></li>
@@ -58,41 +57,41 @@
                         <a href="#" class="fa fa-bell-o bell-icon"></a>&nbsp;&nbsp&nbsp;
                         <a href="#" class="fa fa-user-circle user-icon"></a>
                     </div>
-                   
-                </div>
-             
-                <form action="/teacher/Educafe/assignments/new" method="get">
-                    <button type="submit"  >New Assignemnt</button>
-                     </form>
-                     <%assignments.forEach((item)=>{ %>
-                            <div  style="width: 18rem; margin:1% auto">
-                                <div class="card-header">
-                                    <strong>Teacher Name:</strong>
-                                    <%=item.teacherName%>
-                                </div>
-                                <ul class="list-group list-group-flush">
-                                    <li class="list-group-item"><strong>Subject Name:</strong>
-                                        <%=item.subjectName%>
-                                    </li>
-                                    <li class="list-group-item"><strong>Year:</strong>
-                                        <%=item.year%>
-                                    </li>
-                                    <li class="list-group-item"><strong>Question:</strong>
-                                        <%=item.question%>
-                                    </li>
-                                    <li class="list-group-item"><strong>End Time:</strong>
-                                        <%=item.endTime%>
-                                    </li>
-                                </ul>
-                                <form action="/delete" method="post">
-                                    <button type="submit"   style="margin:auto;">View Assignment</button>
-                                </form>
-                            </div>
-                                <% }); %>
 
+                </div>
+
+                <form action="/teacher/Educafe/assignments/new" method="get">
+                    <button type="submit">New Assignment</button>
+                </form>
+                <%assignments.forEach((item)=>{ %>
+                    <div style="width: 18rem; margin:1% auto">
+                        <div class="card-header">
+                            <strong>Teacher Name:</strong>
+                            <%=item.teacherName%>
+                        </div>
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item"><strong>Subject Name:</strong>
+                                <%=item.subjectName%>
+                            </li>
+                            <li class="list-group-item"><strong>Year:</strong>
+                                <%=item.year%>
+                            </li>
+                            <li class="list-group-item"><strong>Question:</strong>
+                                <%=item.question%>
+                            </li>
+                            <li class="list-group-item"><strong>End Time:</strong>
+                                <%=item.endTime%>
+                            </li>
+                        </ul>
+                        <form action="/delete" method="post">
+                            <button type="submit" style="margin:auto;">View Assignment</button>
+                        </form>
                     </div>
+                    <% }); %>
+
             </div>
-           
-           
+        </div>
+
+
         </div>
         <%- include("partials/footerMain.ejs"); -%>
