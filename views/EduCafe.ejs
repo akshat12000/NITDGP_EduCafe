@@ -59,8 +59,75 @@
                         <a href="#" class="fa fa-user-circle user-icon"></a>
                     </div>
                 </div>
+                <div><br>
+                    <% if(designation==="student"){%>
+                        <h1 style="text-align:center;margin-bottom:1.5%">My <span style="color:#8a658f">Classroom</span> </h1>
+                        <hr>
+                        <h3 style="margin-top:1%;">Today,
+                            <%=date%>
+                                <%=month%>
+                        </h3>
+                        <div style="margin-top: 1%;">
+                            <div class="class-flex">
+                                <div class="time-div">9:00 AM</div>
+                                <div class="class-flex-card">
+                                    <p style="color: crimson;"><i class="fa fa-video-camera"></i> Live Class</p>
+                                    <h4>Physics Lecture</h4>
+                                    <p>45 min, Teacher Name</p>
+                                </div>
+                            </div>
+                            <div class="class-flex">
+                                <div class="time-div">10:00 AM</div>
+                                <div class="class-flex-card">
+                                    <p style="color: crimson;"><i class="fa fa-video-camera"></i> Live Class</p>
+                                    <h4>Chemistry Lecture</h4>
+                                    <p>45 min, Teacher Name</p>
+                                </div>
+                            </div>
+                            <div class="class-flex">
+                                <div class="time-div">11:00 AM</div>
+                                <div class="class-flex-card">
+                                    <p style="color: crimson;"><i class="fa fa-video-camera"></i> Live Class</p>
+                                    <h4>Maths Lecture</h4>
+                                    <p>45 min, Teacher Name</p>
+                                </div>
+                            </div>
+                            <div class="class-flex">
+                                <div class="time-div">12:00 AM</div>
+                                <div class="class-flex-card">
+                                    <p style="color: crimson;"><i class="fa fa-video-camera"></i> Live Class</p>
+                                    <h4>Biology Lecture</h4>
+                                    <p>45 min, Teacher Name</p>
+                                </div>
+                            </div>
+                            <div class="class-flex">
+                                <div class="time-div">2:00 AM</div>
+                                <div class="class-flex-card">
+                                    <p style="color: crimson;"><i class="fa fa-video-camera"></i> Live Class</p>
+                                    <h4>Computer Lecture</h4>
+                                    <p>45 min, Teacher Name</p>
+                                </div>
+                            </div>
+                            <div class="class-flex">
+                                <div class="time-div">3:00 AM</div>
+                                <div class="class-flex-card">
+                                    <p style="color: crimson;"><i class="fa fa-video-camera"></i> Live Class</p>
+                                    <h4>Physical Education Lecture</h4>
+                                    <p>45 min, Teacher Name</p>
+                                </div>
+                            </div>
+                        </div>
+                        <%}%>
+                            <% if(designation==="teacher"){%>
+                                <h1 style="text-align:center;margin-bottom:2%">My <span style="color:#8a658f">Lectures</span> </h1>
+                                <hr><br>
+                                <h3>Today,
+                                    <%=date%>
+                                        <%=month%>
+                                </h3>
+                                <%}%>
+                </div>
             </div>
         </div>
     </body>
-        <%- include("partials/footerMain.ejs"); -%>
-        
+    <%- include("partials/footerMain.ejs"); -%>

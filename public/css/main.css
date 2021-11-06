@@ -1,9 +1,9 @@
-
 * {
     background-color: #f4f4f4;
     box-sizing: border-box;
     margin: 0;
     padding: 0;
+    font-family: "Lato";
 }
 
 .main-content {
@@ -226,37 +226,55 @@ li {
         font-size: 94%;
     }
 }
+
 * {
     padding: 0;
     margin: 0;
-    }
+}
 
-    .container {
+.container {
     display: flex;
     flex-direction: row;
     justify-content: center;
     height: 100vh;
     flex-wrap: no-wrap;
-    }
+}
 
-    .container div {
+.container div {
     width: 50%;
     height: 200px;
-    }
+}
 
-    .picture {
+.picture {
     background: #4451c2;
-    }
+}
 
-    .text {
+.text {
     background: #f451c2;
-    }
+}
 
-    @media (max-width: 600px) {
+@media (max-width: 600px) {
     .container {
         flex-direction: column;
     }
     .container div {
         width: 100%;
     }
+}
+
+.class-flex {
+    display: flex;
+    margin: 0.6% auto;
+}
+
+.time-div {
+    flex: 10%;
+}
+
+.class-flex-card {
+    flex: 90%;
+    border-radius: 5px;
+    border: 1.5px dotted #888;
+    padding: 0.5%;
+    margin-left: 1%;
 }
