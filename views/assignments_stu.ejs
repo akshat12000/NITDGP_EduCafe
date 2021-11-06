@@ -60,7 +60,31 @@
                     </div>
                     
                 </div>
-                
+                <%assignments.forEach((item)=>{ %>
+                    <div  style="width: 18rem; margin:1% auto">
+                        <div class="card-header">
+                            <strong>Teacher Name:</strong>
+                            <%=item.teacherName%>
+                        </div>
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item"><strong>Subject Name:</strong>
+                                <%=item.subjectName%>
+                            </li>
+                            <li class="list-group-item"><strong>Year:</strong>
+                                <%=item.year%>
+                            </li>
+                            <li class="list-group-item"><strong>Question:</strong>
+                                <%=item.question%>
+                            </li>
+                            <li class="list-group-item"><strong>End Time:</strong>
+                                <%=item.endTime%>
+                            </li>
+                        </ul>
+                        <form action=`/student/Educafe/assignments/${item._id}` method="post">
+                            <button type="submit"   style="margin:auto;">View Assignment</button>
+                        </form>
+                    </div>
+                        <% }); %>
             </div>
            
         </div>

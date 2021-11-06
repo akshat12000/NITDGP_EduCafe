@@ -143,6 +143,10 @@ const assignmentSchema = new mongoose.Schema({
         type: Date,
         required: true
     },
+    status: {
+        type: String,
+    },
+    studentsSubmitted: [{  type: String }] 
 });
 
 studentSchema.plugin(findOrCreate);
@@ -235,13 +239,17 @@ app.post("/teacher/register", function(req, res) {
 
 
 app.get("/student/logout", function(req, res) {
-    //req.logout();
-    res.redirect("/");
+    req.session.destroy(err => {
+        console.log(err);
+        res.redirect('/');
+      });
 });
 
 app.get("/teacher/logout", function(req, res) {
-    //req.logout();
-    res.redirect("/");
+    req.session.destroy(err => {
+        console.log(err);
+        res.redirect('/');
+      });
 });
 
 app.post("/student/login", function(req, res) {
@@ -291,10 +299,20 @@ app.post("/teacher/login", function(req, res) {
 });
 
 app.get("/student/Educafe/assignments",(req,res)=>{
-    res.render("assignments_stu",{designation:"student"});
+    const student = req.session.user;
+  
+    Assignment.find({year:student.year},(err,foundAssignments)=>{
+        if(err){
+            console.log(err);
+        }else{
+            
+            res.render("assignments_stu",{designation:"student",assignments:foundAssignments,curUser:student});
+        }
+    });
 });
 
 app.get("/teacher/Educafe/assignments",(req,res)=>{
+    console.log(req.session);  
     const teacherId = req.session.user._id;
     Assignment.find({teacherId:teacherId},(err,foundAssignments)=>{
         if(err){
@@ -318,6 +336,7 @@ app.post("/teacher/Educafe/assignments/new",(req,res)=>{
         year: req.body.year,
         question: req.body.question,
         endTime: req.body.endTime,
+        status:"assigned"
     });
     newAssignment.save(function(err){
         if(err){

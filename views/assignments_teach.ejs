@@ -65,6 +65,7 @@
                     <button type="submit"  >New Assignemnt</button>
                      </form>
                      <%assignments.forEach((item)=>{ %>
+                        <%if(curUser.subjects.find(item.subject)){%>
                             <div  style="width: 18rem; margin:1% auto">
                                 <div class="card-header">
                                     <strong>Teacher Name:</strong>
@@ -88,8 +89,8 @@
                                     <button type="submit"   style="margin:auto;">View Assignment</button>
                                 </form>
                             </div>
+                            <%}%>
                                 <% }); %>
-
                     </div>
             </div>
            
