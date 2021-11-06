@@ -13,7 +13,11 @@ const app = express();
 
 app.set('view engine', 'ejs');
 
-app.use(bodyParser.urlencoded({ extended: true }));
+// app.use(bodyParser.json());
+// app.use(bodyParser.urlencoded({ extended: true }));
+
+app.use(express.urlencoded({extended: true}));
+app.use(express.json());
 app.use(express.static("public"));
 
 app.use(session({
@@ -99,6 +103,10 @@ const teacherSchema = new mongoose.Schema({
 });
 
 const assignmentSchema = new mongoose.Schema({
+    teacherId: {
+        type: String,
+        required: true
+    },
     teacherName: {
         type: String,
         required: true
@@ -107,20 +115,18 @@ const assignmentSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    year:{
+        type: String,
+        required: true
+    },
     question: {
         type: String,
         required: true
     },
-    deadline: {
-        startTime: {
-            type: Date,
-            required: true
-        },
-        endTime: {
-            type: Date,
-            required: true
-        },
-    }
+    endTime: {
+        type: Date,
+        required: true
+    },
 });
 
 studentSchema.plugin(findOrCreate);
@@ -187,7 +193,7 @@ app.post("/student/register", function(req, res) {
             if (err) {
                 console.log(err);
             } else {
-                res.redirect("/student/EduCafe");
+                res.redirect("/student/login");
             }
         });
     });
@@ -206,7 +212,7 @@ app.post("/teacher/register", function(req, res) {
             if (err) {
                 console.log(err);
             } else {
-                res.redirect("/teacher/EduCafe");
+                res.redirect("/teacher/login");
             }
         });
     });
@@ -226,7 +232,7 @@ app.get("/teacher/logout", function(req, res) {
 app.post("/student/login", function(req, res) {
     const username = req.body.username;
     const password = req.body.password;
-
+    
     Student.findOne({ email: username }, function(err, foundStudent) {
         if (err) {
             console.log(err);
@@ -234,6 +240,8 @@ app.post("/student/login", function(req, res) {
             if (foundStudent) {
                 bcrypt.compare(password, foundStudent.password, function(err, result) {
                     if (!err) {
+                        req.session.user = foundStudent;
+                        req.session.save()
                         res.redirect("/student/EduCafe");
                     } else {
                         console.log(err);
@@ -247,7 +255,7 @@ app.post("/student/login", function(req, res) {
 app.post("/teacher/login", function(req, res) {
     const username = req.body.username;
     const password = req.body.password;
-
+    
     Teacher.findOne({ email: username }, function(err, foundTeacher) {
         if (err) {
             console.log(err);
@@ -255,12 +263,51 @@ app.post("/teacher/login", function(req, res) {
             if (foundTeacher) {
                 bcrypt.compare(password, foundTeacher.password, function(err, result) {
                     if (!err) {
+                        req.session.user = foundTeacher;
+                         req.session.save();
                         res.redirect("/teacher/EduCafe");
                     } else {
                         console.log(err);
                     }
                 });
             }
+        }
+    });
+});
+
+app.get("/student/Educafe/assignments",(req,res)=>{
+    res.render("assignments_stu",{designation:"student"});
+});
+
+app.get("/teacher/Educafe/assignments",(req,res)=>{
+    const teacherId = req.session.user._id;
+    Assignment.find({teacherId:teacherId},(err,foundAssignments)=>{
+        if(err){
+            console.log(err);
+        }else{
+            res.render("assignments_teach",{designation:"teacher",assignments:foundAssignments});
+        }
+    });    
+});
+
+app.get("/teacher/Educafe/assignments/new",(req,res)=>{
+    const nt=req.session.user._id;
+    res.render("assignment_new",{designation:"teacher"});
+});
+app.post("/teacher/Educafe/assignments/new",(req,res)=>{
+    const newAssignment = new Assignment({
+        teacherId: req.session.user._id,
+        teacherName: req.body.teacherName,
+        subjectName: req.body.subjectName,
+        year: req.body.year,
+        question: req.body.question,
+        endTime: req.body.endTime,
+    });
+    newAssignment.save(function(err){
+        if(err){
+            console.log(err);
+        }else{
+            res.redirect("/teacher/Educafe/assignments");
         }
     });
 });
