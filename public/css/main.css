@@ -3,6 +3,7 @@
     box-sizing: border-box;
     margin: 0;
     padding: 0;
+    font-family: "Lato";
 }
 
 .main-content {
@@ -225,36 +226,91 @@ li {
         font-size: 94%;
     }
 }
+
 * {
-  padding: 0;
-  margin: 0;
+    padding: 0;
+    margin: 0;
 }
 
 .container {
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  height: 100vh;
-  flex-wrap: no-wrap;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    height: 100vh;
+    flex-wrap: no-wrap;
 }
 
 .container div {
-  width: 50%;
-  height: 200px;
+    width: 50%;
+    height: 200px;
 }
 
 .picture {
-  background: #4451c2;
+    background: #4451c2;
 }
 
 .text {
-  background: #f451c2;
+    background: #f451c2;
 }
 
 @media (max-width: 600px) {
-  .container {
-    flex-direction: column;
-  }
-  .container div {
-    width: 100%;
-  }
+    .container {
+        flex-direction: column;
+    }
+    .container div {
+        width: 100%;
+    }
+}
+
+.class-flex {
+    display: flex;
+    margin: 0.6% auto;
+}
+
+.time-div {
+    flex: 10%;
+}
+
+.class-flex-card {
+    flex: 90%;
+    border-radius: 5px;
+    border: 1.5px dotted #888;
+    padding: 0.5%;
+    margin-left: 1%;
+}
+
+.assignment-form {
+    padding: 1%;
+    margin: 1%;
+}
+
+.form-group {
+    width: 60%;
+    display: flex;
+    margin: 2% auto;
+}
+
+.form-group label {
+    flex: 0%;
+    font-weight: bold;
+}
+
+.form-group input {
+    flex: 10%;
+}
+
+#reg-btn {
+    background-color: #f4f4f4;
+    color: #8a658f;
+    font-size: 1rem;
+    display: block;
+    margin: 2% auto;
+    border: 1px solid #8a658f;
+    border-radius: 5px;
+    padding: 1% 2%;
+}
+
+#reg-btn:hover {
+    background-color: #8a658f;
+    color: #f4f4f4;
+}
