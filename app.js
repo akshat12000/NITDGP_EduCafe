@@ -6,18 +6,15 @@ const ejs = require("ejs");
 const mongoose = require("mongoose");
 const session = require("express-session");
 const findOrCreate = require("mongoose-findorcreate");
-const bcrypt = require('bcrypt');
-const saltRounds = 10;
+const passport = require("passport");
+const passportLocalMongoose = require("passport-local-mongoose");
 
 const app = express();
 
 app.set('view engine', 'ejs');
 
-// app.use(bodyParser.json());
-// app.use(bodyParser.urlencoded({ extended: true }));
-
-app.use(express.urlencoded({ extended: true }));
-app.use(express.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
 app.use(express.static("public"));
 
 app.use(session({
@@ -25,6 +22,9 @@ app.use(session({
     resave: false,
     saveUninitialized: false
 }));
+
+app.use(passport.initialize());
+app.use(passport.session());
 
 mongoose.connect('mongodb://' + process.env.DB_USERNAME + ':' + process.env.DB_PASSWORD + '@dbaas253.hyperp-dbaas.cloud.ibm.com:30055,dbaas254.hyperp-dbaas.cloud.ibm.com:30906,dbaas255.hyperp-dbaas.cloud.ibm.com:30666/admin?replicaSet=IBM', { useNewUrlParser: true, useUnifiedTopology: true, ssl: true, sslValidate: true, sslCA: process.env.CERTI_FILE });
 
@@ -44,23 +44,12 @@ const subjectSchema = new mongoose.Schema({
     }
 });
 
-// const subjectlistSchema = new mongoose.Schema({
-//     name: {
-//         type: String,
-//         required: true
-//     }
-// });
-
 const studentSchema = new mongoose.Schema({
     name: {
         type: String,
         required: true
     },
-    email: {
-        type: String,
-        required: true
-    },
-    password: {
+    username: {
         type: String,
         required: true
     },
@@ -130,6 +119,7 @@ const assignmentSchema = new mongoose.Schema({
 });
 
 studentSchema.plugin(findOrCreate);
+studentSchema.plugin(passportLocalMongoose);
 teacherSchema.plugin(findOrCreate);
 subjectSchema.plugin(findOrCreate);
 assignmentSchema.plugin(findOrCreate);
@@ -139,6 +129,15 @@ const Teacher = new mongoose.model("Teacher", teacherSchema);
 const Subject = new mongoose.model("Subject", subjectSchema);
 const Assignment = new mongoose.model("Assignment", assignmentSchema);
 
+passport.use(Student.createStrategy());
+
+passport.serializeUser(function(student, done) {
+    done(null, student);
+});
+
+passport.deserializeUser(function(student, done) {
+    done(null, student);
+});
 
 app.get("/", function(req, res) {
     res.render("home");
@@ -160,6 +159,18 @@ app.get("/student/EduCafe", function(req, res) {
     res.render("EduCafe", { designation: "student", date: date, month: month });
 });
 
+app.get("/student/Educafe/overview", function(req, res) {
+    const studentInfo = {
+        name: req.user.name,
+        email: req.user.username,
+        contact: req.user.contact,
+        year: req.user.year,
+        roll: req.user.roll,
+        subjects: req.user.subjects
+    };
+    res.render("overview", { details: studentInfo, designation: "student" });
+});
+
 app.get("/teacher/EduCafe", function(req, res) {
     var date = new Date().getDate();
     var today = new Date();
@@ -172,7 +183,6 @@ app.get("/student/login", function(req, res) {
 });
 
 app.get("/student/register", function(req, res) {
-    subjects = [];
     res.render("register", { designation: "student" });
 });
 
@@ -185,25 +195,18 @@ app.get("/teacher/register", function(req, res) {
 });
 
 app.post("/student/register", function(req, res) {
-    console.log(req.body);
-    bcrypt.hash(req.body.password, saltRounds, function(err, hash) {
-        student = new Student({
-            name: req.body.name,
-            email: req.body.username,
-            password: hash,
-            contact: req.body.contact,
-            year: req.body.year,
-            roll: req.body.roll,
-            subjects: req.body.subjects,
-        });
-        student.save(function(err) {
-            if (err) {
-                console.log(err);
-            } else {
-                res.redirect("/student/login");
-            }
-        });
+
+    Student.register({ name: req.body.name, username: req.body.username, contact: req.body.contact, year: req.body.year, roll: req.body.roll, subjects: req.body.subjects }, req.body.password, function(err, student) {
+        if (err) {
+            console.log(err);
+            res.redirect("/student/register");
+        } else {
+            passport.authenticate("local")(req, res, function() {
+                res.redirect("/student/EduCafe");
+            });
+        }
     });
+
 });
 
 app.post("/teacher/register", function(req, res) {
@@ -227,7 +230,7 @@ app.post("/teacher/register", function(req, res) {
 
 
 app.get("/student/logout", function(req, res) {
-    //req.logout();
+    req.logout();
     res.redirect("/");
 });
 
@@ -237,24 +240,18 @@ app.get("/teacher/logout", function(req, res) {
 });
 
 app.post("/student/login", function(req, res) {
-    const username = req.body.username;
-    const password = req.body.password;
 
-    Student.findOne({ email: username }, function(err, foundStudent) {
+    const student = new Student({
+        username: req.body.username,
+        password: req.body.password
+    });
+    req.logIn(student, function(err) {
         if (err) {
             console.log(err);
         } else {
-            if (foundStudent) {
-                bcrypt.compare(password, foundStudent.password, function(err, result) {
-                    if (!err) {
-                        req.session.user = foundStudent;
-                        req.session.save()
-                        res.redirect("/student/EduCafe");
-                    } else {
-                        console.log(err);
-                    }
-                });
-            }
+            passport.authenticate('local')(req, res, function() {
+                res.redirect("/student/EduCafe");
+            });
         }
     });
 });

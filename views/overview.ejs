@@ -55,12 +55,57 @@
                     <!--- Notification and User Icons --->
                     <div class="user-disp">
                         <a href="#" class="fa fa-bell-o bell-icon"></a>&nbsp;&nbsp&nbsp;
-                        <a href="#" class="fa fa-user-circle user-icon"></a>
+                        <% if(designation==="student"){%>
+                            <a href="/student/EduCafe/overview" class="fa fa-user-circle user-icon"></a>
+                            <%}%>
+                                <% if(designation==="teacher"){%>
+                                    <a href="/teacher/EduCafe/overview" class="fa fa-user-circle user-icon"></a>
+                                    <%}%>
                     </div>
-
+                </div><br>
+                <div>
+                    <h1 style="text-align:center;margin-bottom:1.5%">User <span style="color:#8a658f">Profile</span> </h1>
+                    <hr><br>
+                    <table style="margin: auto;" class="over-table">
+                        <tr>
+                            <td style="font-weight: bold;">Name:</td>
+                            <td>
+                                <%=details.name%>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="font-weight: bold;">Email:</td>
+                            <td>
+                                <%=details.email%>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="font-weight: bold;">Contact:</td>
+                            <td>
+                                <%=details.contact%>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="font-weight: bold;">Year:</td>
+                            <td>
+                                <%=details.year%>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="font-weight: bold;">Roll Number:</td>
+                            <td>
+                                <%=details.roll%>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="font-weight: bold;">Subjects:</td>
+                            <td>
+                                <%=details.subjects%>
+                            </td>
+                        </tr>
+                    </table>
                 </div>
-
             </div>
-
         </div>
-        <%- include("partials/footerMain.ejs"); -%>
+    </body>
+    <%- include("partials/footerMain.ejs"); -%>

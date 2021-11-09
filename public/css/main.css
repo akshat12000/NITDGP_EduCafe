@@ -314,3 +314,8 @@ li {
     background-color: #8a658f;
     color: #f4f4f4;
 }
+
+.over-table td {
+    padding: 4% 8%;
+    width: 15vw;
+}
