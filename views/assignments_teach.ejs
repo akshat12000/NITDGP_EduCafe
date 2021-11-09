@@ -59,13 +59,11 @@
                     </div>
 
                 </div>
-<<<<<<< HEAD
              
                 <form action="/teacher/Educafe/assignments/new" method="get">
                     <button type="submit"  >New Assignemnt</button>
                      </form>
                      <%assignments.forEach((item)=>{ %>
-                        <%if(curUser.subjects.find(item.subject)){%>
                             <div  style="width: 18rem; margin:1% auto">
                                 <div class="card-header">
                                     <strong>Teacher Name:</strong>
@@ -89,39 +87,9 @@
                                     <button type="submit"   style="margin:auto;">View Assignment</button>
                                 </form>
                             </div>
-                            <%}%>
                                 <% }); %>
-=======
-
-                <form action="/teacher/Educafe/assignments/new" method="get">
-                    <button type="submit">New Assignment</button>
-                </form>
-                <%assignments.forEach((item)=>{ %>
-                    <div style="width: 18rem; margin:1% auto">
-                        <div class="card-header">
-                            <strong>Teacher Name:</strong>
-                            <%=item.teacherName%>
-                        </div>
-                        <ul class="list-group list-group-flush">
-                            <li class="list-group-item"><strong>Subject Name:</strong>
-                                <%=item.subjectName%>
-                            </li>
-                            <li class="list-group-item"><strong>Year:</strong>
-                                <%=item.year%>
-                            </li>
-                            <li class="list-group-item"><strong>Question:</strong>
-                                <%=item.question%>
-                            </li>
-                            <li class="list-group-item"><strong>End Time:</strong>
-                                <%=item.endTime%>
-                            </li>
-                        </ul>
-                        <form action="/delete" method="post">
-                            <button type="submit" style="margin:auto;">View Assignment</button>
-                        </form>
->>>>>>> 765617d29aebb78bb2ca59e3fa55bd6e281a8453
                     </div>
-                    <% }); %>
+    
 
             </div>
         </div>

@@ -59,7 +59,6 @@
                     </div>
 
                 </div>
-<<<<<<< HEAD
                 <%assignments.forEach((item)=>{ %>
                     <div  style="width: 18rem; margin:1% auto">
                         <div class="card-header">
@@ -80,14 +79,11 @@
                                 <%=item.endTime%>
                             </li>
                         </ul>
-                        <form action=`/student/Educafe/assignments/${item._id}` method="post">
+                        <form action="/student/Educafe/assignments/<%=item." method="post">
                             <button type="submit"   style="margin:auto;">View Assignment</button>
                         </form>
                     </div>
                         <% }); %>
-=======
-
->>>>>>> 765617d29aebb78bb2ca59e3fa55bd6e281a8453
             </div>
 
         </div>
