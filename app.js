@@ -10,7 +10,7 @@ const findOrCreate = require("mongoose-findorcreate");
 const bcrypt = require('bcrypt');
 const multer = require("multer")
 const saltRounds = 10;
-
+const File = require("./model/fileSchema");
 const app = express();
 
 app.set('view engine', 'ejs');
@@ -149,18 +149,31 @@ const assignmentSchema = new mongoose.Schema({
     status: {
         type: String,
     },
-    studentsSubmitted: [{  type: String }] 
+    studentsSubmitted: [ [studentSchema] ] 
 });
-
+const submissionSchema = new mongoose.Schema({
+   assignmentId: {
+         type: String,
+        },
+    studentId: {
+        type: String,
+    },
+    fileName:{
+        type: String,
+    }
+});
 studentSchema.plugin(findOrCreate);
 teacherSchema.plugin(findOrCreate);
 subjectSchema.plugin(findOrCreate);
 assignmentSchema.plugin(findOrCreate);
+submissionSchema.plugin(findOrCreate);
+
 
 const Student = new mongoose.model("Student", studentSchema);
 const Teacher = new mongoose.model("Teacher", teacherSchema);
 const Subject = new mongoose.model("Subject", subjectSchema);
 const Assignment = new mongoose.model("Assignment", assignmentSchema);
+const Submission = new mongoose.model("Submission", submissionSchema);
 
 
 app.get("/", function(req, res) {
@@ -179,12 +192,33 @@ const storage = multer.diskStorage({
   
 const uploadStorage = multer({ storage: storage })
 
-// Single file
-app.post("/upload/single", uploadStorage.single("file"), (req, res) => {
-  console.log(req.file)
-  return res.send("Single file")
-})
 
+const multerStorage = multer.diskStorage({
+    destination: (req, file, cb) => {
+      cb(null, "public");
+    },
+    filename: (req, file, cb) => {
+      const ext = file.mimetype.split("/")[1];
+      cb(null, `files/admin-${file.fieldname}-${Date.now()}.${ext}`);
+    },
+  });
+
+const multerFilter = (req, file, cb) => {
+    if (file.mimetype.split("/")[1] === "pdf") {
+      cb(null, true);
+    } else {
+      cb(new Error("Not a PDF File!!"), false);
+    }
+  };
+
+const upload = multer({
+    storage: multerStorage,
+    fileFilter: multerFilter,
+  });
+
+app.get("/storage_check",(req,res)=>{
+    res.render("storage_check");
+})
 app.get("/student", function(req, res) {
     res.render("subHome", { designation: "student" });
 });
@@ -226,7 +260,6 @@ app.get("/teacher/register", function(req, res) {
 });
 
 app.post("/student/register", function(req, res) {
-    console.log(req.body);
     bcrypt.hash(req.body.password, saltRounds, function(err, hash) {
         student = new Student({
             name: req.body.name,
@@ -329,7 +362,7 @@ app.post("/teacher/login", function(req, res) {
 
 app.get("/student/Educafe/assignments",(req,res)=>{
     const student = req.session.user;
-    console.log(req.session);  
+ 
     Assignment.find({year:student.year},(err,foundAssignments)=>{
         if(err){
             console.log(err);
@@ -339,9 +372,48 @@ app.get("/student/Educafe/assignments",(req,res)=>{
         }
     });
 });
-app.get("/student/Educafe/assignments/view/:id",(req,res)=>{
+app.get("/student/Educafe/assignments/view/:id",async (req,res)=>{
     const student = req.session.user;
-    res.render("view_assignment_stu",{designation:"student",assignment:req.params.id,curUser:student});});
+    const submission= await Submission.find({assignmentId:req.params.id,studentId:student._id});
+    Assignment.findById(req.params.id,(err,foundAssignment)=>{
+        res.render("view_assignment_stu",{designation:"student",assignment:foundAssignment,curUser:student,submission:submission});});
+    });
+    
+
+    app.post("/api/uploadFile", upload.single("myFile"), async (req, res) => {
+        const student=req.session.user;
+        const obj = req.body;    
+        try {
+            const newFile = await File.create({
+              name: req.file.filename,
+            });
+            await Assignment.findByIdAndUpdate({_id:obj.assignment}, { $push: { studentsSubmitted: student } });
+            await Submission.create({studentId:student._id,assignmentId:obj.assignment,fileName:req.file.filename});
+
+            res.status(200).json({
+              status: "success",
+              message: "File created successfully!!",
+            });
+          } catch (error) {
+           console.log(error);
+          }
+        
+      });
+
+      app.get("/api/getFiles", async (req, res) => {
+        try {
+          const files = await File.find();
+          res.status(200).json({
+            status: "success",
+            files,
+          });
+        } catch (error) {
+          res.json({
+            status: "Fail",
+            error,
+          });
+        }
+      });
 
 app.get("/teacher/Educafe/assignments",(req,res)=>{
  
