@@ -5,8 +5,10 @@ const bodyParser = require("body-parser");
 const ejs = require("ejs");
 const mongoose = require("mongoose");
 const session = require("express-session");
+const MongoDBStore = require('connect-mongodb-session')(session);
 const findOrCreate = require("mongoose-findorcreate");
 const bcrypt = require('bcrypt');
+const multer = require("multer")
 const saltRounds = 10;
 
 const app = express();
@@ -16,14 +18,31 @@ app.set('view engine', 'ejs');
 // app.use(bodyParser.json());
 // app.use(bodyParser.urlencoded({ extended: true }));
 
+const MONGODB_URI='mongodb://' + process.env.DB_USERNAME + ':' + process.env.DB_PASSWORD + '@dbaas253.hyperp-dbaas.cloud.ibm.com:30055,dbaas254.hyperp-dbaas.cloud.ibm.com:30906,dbaas255.hyperp-dbaas.cloud.ibm.com:30666/admin?replicaSet=IBM';
+const store = new MongoDBStore({
+    uri: 'mongodb://' + process.env.DB_USERNAME + ':' + process.env.DB_PASSWORD + '@dbaas253.hyperp-dbaas.cloud.ibm.com:30055,dbaas254.hyperp-dbaas.cloud.ibm.com:30906,dbaas255.hyperp-dbaas.cloud.ibm.com:30666/admin?replicaSet=IBM',
+    collection: 'mySessions',
+
+    connectionOptions: {
+        useNewUrlParser: true, 
+        useUnifiedTopology: true, ssl: true, sslValidate: true, sslCA: process.env.CERTI_FILE
+    }
+  });
+
+
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(express.static("public"));
 
+store.on('error', function(error) {
+    console.log(error);
+  });
+
 app.use(session({
     secret: "Our little Secret.",
-    resave: false,
-    saveUninitialized: false
+   resave: true,
+    saveUninitialized: true,
+    store: store
 }));
 
 mongoose.connect('mongodb://' + process.env.DB_USERNAME + ':' + process.env.DB_PASSWORD + '@dbaas253.hyperp-dbaas.cloud.ibm.com:30055,dbaas254.hyperp-dbaas.cloud.ibm.com:30906,dbaas255.hyperp-dbaas.cloud.ibm.com:30666/admin?replicaSet=IBM', { useNewUrlParser: true, useUnifiedTopology: true, ssl: true, sslValidate: true, sslCA: process.env.CERTI_FILE });
@@ -147,6 +166,24 @@ const Assignment = new mongoose.model("Assignment", assignmentSchema);
 app.get("/", function(req, res) {
     res.render("home");
 });
+
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+      cb(null, "uploads/")
+    },
+    filename: (req, file, cb) => {
+      cb(null, Date.now() + "-" + file.originalname)
+    },
+  })
+
+  
+const uploadStorage = multer({ storage: storage })
+
+// Single file
+app.post("/upload/single", uploadStorage.single("file"), (req, res) => {
+  console.log(req.file)
+  return res.send("Single file")
+})
 
 app.get("/student", function(req, res) {
     res.render("subHome", { designation: "student" });
@@ -292,7 +329,7 @@ app.post("/teacher/login", function(req, res) {
 
 app.get("/student/Educafe/assignments",(req,res)=>{
     const student = req.session.user;
-  
+    console.log(req.session);  
     Assignment.find({year:student.year},(err,foundAssignments)=>{
         if(err){
             console.log(err);
@@ -302,9 +339,12 @@ app.get("/student/Educafe/assignments",(req,res)=>{
         }
     });
 });
+app.get("/student/Educafe/assignments/view/:id",(req,res)=>{
+    const student = req.session.user;
+    res.render("view_assignment_stu",{designation:"student",assignment:req.params.id,curUser:student});});
 
 app.get("/teacher/Educafe/assignments",(req,res)=>{
-    console.log(req.session);  
+ 
     const teacherId = req.session.user._id;
     Assignment.find({ teacherId: teacherId }, (err, foundAssignments) => {
         if (err) {
@@ -338,6 +378,7 @@ app.post("/teacher/Educafe/assignments/new", (req, res) => {
     });
 });
 
+app.get("")
 app.listen(3000, function(req, res) {
     console.log("The server is running at port 3000");
 });
