@@ -239,7 +239,7 @@ app.get("/teacher/EduCafe", function(req, res) {
     var today = new Date();
     var month = today.toLocaleString('default', { month: 'short' });
     if (req.isAuthenticated()) {
-        Subject.find({ name: req.user.subjects }, function(err, subject) {
+        Subject.find({ $and: [{ name: req.user.subjects }, { teacherId: req.user._id }] }, function(err, subject) {
             res.render("EduCafe", { designation: "teacher", date: date, month: month, lecture: subject, name: req.user.name });
         });
     } else {
