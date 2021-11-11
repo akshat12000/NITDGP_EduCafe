@@ -7,6 +7,7 @@ const mongoose = require("mongoose");
 const session = require("express-session");
 const findOrCreate = require("mongoose-findorcreate");
 const bcrypt = require('bcrypt');
+const nodemailer = require("nodemailer");
 const saltRounds = 10;
 
 const app = express();
@@ -301,6 +302,62 @@ app.get("/student/Educafe/assignments",(req,res)=>{
             res.render("assignments_stu",{designation:"student",assignments:foundAssignments,curUser:student});
         }
     });
+});
+
+app.get("/teacher/Educafe/send-notification", (req, res) => {
+    // if (req.session.user.type != "teacher") {
+    //     res.redirect('/');
+    // } else {
+    res.render('send_notif', { designation: "teacher" });
+    // }
+});
+
+app.post("/teacher/Educafe/send-notification", async (req, res, next) => {
+    // const email = req.body.email;
+    const testAccount  = await nodemailer.createTestAccount();
+    const recipientSubject = req.body.recipientSubject;
+    const recipientYear = req.body.recipientYear;
+    const subject = req.body.subjectName;
+    const bodyOfEmail = req.body.bodyOfEmail;
+
+    // create reusable transporter object using the default SMTP transport
+    let transporter = nodemailer.createTransport({
+        host: "smtp.ethereal.email",
+        port: 587,
+        secure: false, // true for 465, false for other ports
+        auth: {
+        user: testAccount.user, // generated ethereal user
+        pass: testAccount.pass, // generated ethereal password
+        },
+    });
+
+    let receiverList = [];
+
+    Student.find({year: recipientYear, subjects: recipientSubject}).then((students) => {
+        if (students) {
+            forEach(students, (student) => {
+                receiverList.append(student.email);
+            })
+        } else {
+            console.log("No students found!");
+            res.redirect('/teacher/Educafe/send-notification');
+            next();
+        }
+    }).catch((err) => {
+        console.log(err);
+    })
+
+    const emailList = receiverList.join([separator = ', ']);
+
+    // send mail with defined transport object
+    let info = await transporter.sendMail({
+        from: `"${req.session.user.name}" <${req.session.user.email}>`, // sender address
+        to: emailList, // list of receivers
+        subject: subject, // Subject line
+        text: bodyOfEmail, // plain text body
+        // html: "<b>Hello world?</b>", // html body
+    });
+    res.redirect("/teacher/Educafe/send-notification");
 });
 
 app.get("/teacher/Educafe/assignments",(req,res)=>{
