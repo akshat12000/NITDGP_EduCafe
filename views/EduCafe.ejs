@@ -105,7 +105,7 @@
                                 </div>
                             </div>
                             <div class="class-flex">
-                                <div class="time-div">2:00 AM</div>
+                                <div class="time-div">2:00 PM</div>
                                 <div class="class-flex-card">
                                     <p style="color: crimson;"><i class="fa fa-video-camera"></i> Live Class</p>
                                     <h4>Computer Lecture</h4>
@@ -113,7 +113,7 @@
                                 </div>
                             </div>
                             <div class="class-flex">
-                                <div class="time-div">3:00 AM</div>
+                                <div class="time-div">3:00 PM</div>
                                 <div class="class-flex-card">
                                     <p style="color: crimson;"><i class="fa fa-video-camera"></i> Live Class</p>
                                     <h4>Physical Education Lecture</h4>
@@ -129,7 +129,27 @@
                                     <%=date%>
                                         <%=month%>
                                 </h3>
-                                <%}%>
+                                <div class="class-flex">
+                                    <div class="time-div">
+                                        <%=lecture.time%>
+                                    </div>
+                                    <div class="class-flex-card">
+                                        <p style="color: crimson;"><i class="fa fa-video-camera"></i> Live Class</p>
+                                        <h4>
+                                            <%=lecture.username%> Lecture
+                                        </h4>
+                                        <p>45 min,
+                                            <%=name%>
+                                        </p>
+                                    </div>
+                                </div>
+                                <% if(new Date ('1/1/1999 ' + lecture.time.slice(0,5)) >= new Date ('1/1/1999 ' + new Date().toLocaleTimeString().slice(0,5)) ){%>
+                                    <button><%=lecture.time.slice(0,5)%></button>
+                                    <%}%>
+                                        <% if(new Date ('1/1/1999 ' + lecture.time.slice(0,5)) <= new Date ('1/1/1999 ' + new Date().toLocaleTimeString().slice(0,5))){%>
+                                            <button>Bye</button>
+                                            <%}%>
+                                                <%}%>
                 </div>
             </div>
         </div>

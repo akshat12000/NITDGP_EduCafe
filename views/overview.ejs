@@ -85,24 +85,26 @@
                                 <%=details.contact%>
                             </td>
                         </tr>
-                        <tr>
-                            <td style="font-weight: bold;">Year:</td>
-                            <td>
-                                <%=details.year%>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td style="font-weight: bold;">Roll Number:</td>
-                            <td>
-                                <%=details.roll%>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td style="font-weight: bold;">Subjects:</td>
-                            <td>
-                                <%=details.subjects%>
-                            </td>
-                        </tr>
+                        <% if(designation==="student"){%>
+                            <tr>
+                                <td style="font-weight: bold;">Year:</td>
+                                <td>
+                                    <%=details.year%>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="font-weight: bold;">Roll Number:</td>
+                                <td>
+                                    <%=details.roll%>
+                                </td>
+                            </tr>
+                            <%}%>
+                                <tr>
+                                    <td style="font-weight: bold;">Subjects:</td>
+                                    <td>
+                                        <%=details.subjects%>
+                                    </td>
+                                </tr>
                     </table>
                 </div>
             </div>

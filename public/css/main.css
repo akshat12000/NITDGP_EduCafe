@@ -319,3 +319,15 @@ li {
     padding: 4% 8%;
     width: 15vw;
 }
+
+.assignment-container {
+    height: 35vw;
+    overflow-y: scroll;
+}
+
+.assignment-card-container {
+    display: inline-block;
+    padding: 1%;
+    border: 1px dotted #888;
+    border-radius: 5px;
+}
