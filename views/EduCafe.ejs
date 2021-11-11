@@ -72,54 +72,26 @@
                                 <%=month%>
                         </h3>
                         <div style="margin-top: 1%;">
-                            <div class="class-flex">
-                                <div class="time-div">9:00 AM</div>
-                                <div class="class-flex-card">
-                                    <p style="color: crimson;"><i class="fa fa-video-camera"></i> Live Class</p>
-                                    <h4>Physics Lecture</h4>
-                                    <p>45 min, Teacher Name</p>
+                            <% subjectList.forEach((item)=>{%>
+                                <div class="class-flex">
+                                    <div class="time-div">
+                                        <%=item.time%>
+                                    </div>
+                                    <div class="class-flex-card">
+                                        <div class="flex-card-sister">
+                                            <p style="color: crimson;"><i class="fa fa-video-camera"></i> Live Class</p>
+                                            <h4>
+                                                <%=item.name%> Lecture</h4>
+                                            <span>45 min,
+                                                <%=item.teacherName%>
+                                            </span>
+                                        </div>
+                                        <div class="flex-card-brother">
+                                            <a href="<%=item.meetlink%>" id="sch-btn">Join Now</a>
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="class-flex">
-                                <div class="time-div">10:00 AM</div>
-                                <div class="class-flex-card">
-                                    <p style="color: crimson;"><i class="fa fa-video-camera"></i> Live Class</p>
-                                    <h4>Chemistry Lecture</h4>
-                                    <p>45 min, Teacher Name</p>
-                                </div>
-                            </div>
-                            <div class="class-flex">
-                                <div class="time-div">11:00 AM</div>
-                                <div class="class-flex-card">
-                                    <p style="color: crimson;"><i class="fa fa-video-camera"></i> Live Class</p>
-                                    <h4>Maths Lecture</h4>
-                                    <p>45 min, Teacher Name</p>
-                                </div>
-                            </div>
-                            <div class="class-flex">
-                                <div class="time-div">12:00 AM</div>
-                                <div class="class-flex-card">
-                                    <p style="color: crimson;"><i class="fa fa-video-camera"></i> Live Class</p>
-                                    <h4>Biology Lecture</h4>
-                                    <p>45 min, Teacher Name</p>
-                                </div>
-                            </div>
-                            <div class="class-flex">
-                                <div class="time-div">2:00 PM</div>
-                                <div class="class-flex-card">
-                                    <p style="color: crimson;"><i class="fa fa-video-camera"></i> Live Class</p>
-                                    <h4>Computer Lecture</h4>
-                                    <p>45 min, Teacher Name</p>
-                                </div>
-                            </div>
-                            <div class="class-flex">
-                                <div class="time-div">3:00 PM</div>
-                                <div class="class-flex-card">
-                                    <p style="color: crimson;"><i class="fa fa-video-camera"></i> Live Class</p>
-                                    <h4>Physical Education Lecture</h4>
-                                    <p>45 min, Teacher Name</p>
-                                </div>
-                            </div>
+                                <%})%>
                         </div>
                         <%}%>
                             <% if(designation==="teacher"){%>
@@ -129,27 +101,34 @@
                                     <%=date%>
                                         <%=month%>
                                 </h3>
-                                <div class="class-flex">
-                                    <div class="time-div">
-                                        <%=lecture.time%>
-                                    </div>
-                                    <div class="class-flex-card">
-                                        <p style="color: crimson;"><i class="fa fa-video-camera"></i> Live Class</p>
-                                        <h4>
-                                            <%=lecture.username%> Lecture
-                                        </h4>
-                                        <p>45 min,
-                                            <%=name%>
-                                        </p>
-                                    </div>
+                                <a href="/teacher/EduCafe/schedule" id="sch-btn" style="padding:1% 2%;">Schedule Class</a>
+                                <div style="margin-top: 1%;">
+                                    <% lecture.forEach((lec)=>{%>
+                                        <div class="class-flex">
+                                            <div class="time-div">
+                                                <%=lec.time%>
+                                            </div>
+                                            <div class="class-flex-card">
+                                                <div class="flex-card-sister">
+                                                    <p style="color: crimson;"><i class="fa fa-video-camera"></i> Live Class</p>
+                                                    <h4>
+                                                        <%=lec.name%> Lecture
+                                                    </h4>
+                                                    <p>45 min,
+                                                        <%=name%>
+                                                    </p>
+                                                </div>
+                                                <div class="flex-card-brother">
+                                                    <a href="<%=lec.meetlink%>" id="sch-btn">Join Now</a>
+                                                    <form action="/teacher/EduCafe/delete" method="POST">
+                                                        <button id="sch-btn" value=<%=lec._id%> name="delbtn">Cancel Class</button>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <%})%>
                                 </div>
-                                <% if(new Date ('1/1/1999 ' + lecture.time.slice(0,5)) >= new Date ('1/1/1999 ' + new Date().toLocaleTimeString().slice(0,5)) ){%>
-                                    <button><%=lecture.time.slice(0,5)%></button>
-                                    <%}%>
-                                        <% if(new Date ('1/1/1999 ' + lecture.time.slice(0,5)) <= new Date ('1/1/1999 ' + new Date().toLocaleTimeString().slice(0,5))){%>
-                                            <button>Bye</button>
-                                            <%}%>
-                                                <%}%>
+                                <%}%>
                 </div>
             </div>
         </div>

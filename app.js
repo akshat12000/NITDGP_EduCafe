@@ -20,7 +20,7 @@ app.use(bodyParser.json());
 app.use(express.static("public"));
 
 app.use(session({
-    secret: "Our little Secret.",
+    secret: process.env.SECRET,
     resave: false,
     saveUninitialized: false
 }));
@@ -38,11 +38,30 @@ const subjectSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    name: {
+        type: String,
+        required: true
+    },
+    year: {
+        type: String,
+        require: true
+    },
+    teacherId: {
+        type: String,
+        required: true
+    },
+    teacherName: {
+        type: String,
+        required: true
+    },
     time: {
         type: String,
         required: true
     },
-    days: [{ type: String }]
+    meetlink: {
+        type: String,
+        required: true
+    }
 });
 
 const studentSchema = new mongoose.Schema({
@@ -169,7 +188,17 @@ app.get("/student/EduCafe", function(req, res) {
     var today = new Date();
     var month = today.toLocaleString('default', { month: 'short' });
     if (req.isAuthenticated()) {
-        res.render("EduCafe", { designation: "student", date: date, month: month });
+        var subList = req.user.subjects;
+        Subject.find({ $and: [{ name: { $in: subList } }, { year: req.user.year }] }, function(err, sub) {
+            if (!err) {
+                res.render("EduCafe", { designation: "student", date: date, month: month, subjectList: sub });
+                // console.log(sub);
+            } else {
+                console.log(err);
+            }
+        });
+        // console.log(subList);
+
     } else {
         res.redirect("/student");
     }
@@ -210,12 +239,46 @@ app.get("/teacher/EduCafe", function(req, res) {
     var today = new Date();
     var month = today.toLocaleString('default', { month: 'short' });
     if (req.isAuthenticated()) {
-        Subject.findOne({ username: req.user.subjects }, function(err, subject) {
+        Subject.find({ name: req.user.subjects }, function(err, subject) {
             res.render("EduCafe", { designation: "teacher", date: date, month: month, lecture: subject, name: req.user.name });
         });
     } else {
         res.redirect("/teacher");
     }
+});
+
+app.post("/teacher/EduCafe", function(req, res) {
+    const Ttime = new Date().getTime();
+    const subject = new Subject({
+        username: req.user.subjects + Ttime,
+        name: req.user.subjects,
+        year: req.body.year,
+        time: req.body.startTime,
+        teacherId: req.user._id,
+        teacherName: req.user.name,
+        meetlink: "https://meet.jit.si/" + req.user._id + "_" + req.body.year
+    });
+    subject.save(function(err) {
+        if (err) {
+            console.log(err);
+        } else {
+            res.redirect("/teacher/EduCafe");
+        }
+    });
+});
+
+app.post("/teacher/EduCafe/delete", function(req, res) {
+    const currentId = req.body.delbtn;
+    Subject.findByIdAndRemove(currentId, function(err) {
+        if (!err) {
+            console.log("Item Deleted Successfully!");
+            res.redirect("/teacher/EduCafe");
+        }
+    });
+});
+
+app.get("/teacher/EduCafe/schedule", function(req, res) {
+    res.render("schedule_class", { designation: "teacher" });
 });
 
 app.get("/student/login", function(req, res) {
@@ -256,7 +319,7 @@ app.post("/teacher/register", function(req, res) {
             console.log(err);
             res.redirect("/teacher/register");
         } else {
-           authTeacher.authenticate("local")(req, res, function() {
+            authTeacher.authenticate("local")(req, res, function() {
                 res.redirect("/teacher/EduCafe");
             });
         }

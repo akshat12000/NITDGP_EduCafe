@@ -273,10 +273,19 @@ li {
 
 .class-flex-card {
     flex: 90%;
+    display: flex;
     border-radius: 5px;
     border: 1.5px dotted #888;
     padding: 0.5%;
     margin-left: 1%;
+}
+
+.flex-card-sister {
+    flex: 85%;
+}
+
+.flex-card-brother {
+    flex: 5%;
 }
 
 .assignment-form {
@@ -311,6 +320,23 @@ li {
 }
 
 #reg-btn:hover {
+    background-color: #8a658f;
+    color: #f4f4f4;
+}
+
+#sch-btn {
+    background-color: #f4f4f4;
+    color: #8a658f;
+    font-size: 0.9rem;
+    display: inline-block;
+    text-decoration: none;
+    margin: 2% auto;
+    border: 1px solid #8a658f;
+    border-radius: 5px;
+    padding: 4% 5%;
+}
+
+#sch-btn:hover {
     background-color: #8a658f;
     color: #f4f4f4;
 }
