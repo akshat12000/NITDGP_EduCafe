@@ -120,25 +120,35 @@
                     <%=item.endTime%>
                   </li>
                 </ul>
-              <%const obj=submission%>
-                <%if(submission){%>
-                 <div>
-
-                   <a href="/<%=submission.fileName%>">View Submission</a>
-                 </div> 
-                  <%}else{%>
-                    <form
-                    action="/api/uploadFile"
-                    enctype="multipart/form-data"
-                    method="post"
-                    >
-                    <input type="file" class="admin__input" id="myFile" name="myFile" />
-                    <input type="hidden" name="assignment" value="<%=assignment._id%>" />
-                    <input class="admin__submit" type="submit" />
-                  </form>
-                    <%}%>
-                
+                <%const students= assignment.studentsSubmitted%>
+                <%students.forEach((student)=>{ %>
+                    <div  style="width: 18rem; margin:1% auto">
+                        <div class="card-header">
+                            <strong>Student Name:</strong>
+                            <%=student.name%>
+                        </div>
+                        <!-- <ul class="list-group list-group-flush">
+                            <li class="list-group-item"><strong>Subject Name:</strong>
+                                <%=item.subjectName%>
+                            </li>
+                            <li class="list-group-item"><strong>Year:</strong>
+                                <%=item.year%>
+                            </li>
+                            <li class="list-group-item"><strong>Question:</strong>
+                                <%=item.question%>
+                            </li>
+                            <li class="list-group-item"><strong>End Time:</strong>
+                                <%=item.endTime%>
+                            </li>
+                        </ul> -->
+                        <form action="/teacher/assignments/view/<%=assignment._id%>" method="get">
+                            <input type="hidden" name="student" value="<%=student._id%>" />
+                            <button type="submit"   style="margin:auto;">View Assignment</button>
+                        </form>
+                    </div>
+                        <% }); %>
             </div>
+
           </div>
         </div>
       </body>

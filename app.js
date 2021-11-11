@@ -40,8 +40,8 @@ store.on('error', function(error) {
 
 app.use(session({
     secret: "Our little Secret.",
-   resave: true,
-    saveUninitialized: true,
+   resave: false,
+    saveUninitialized: false,
     store: store
 }));
 
@@ -149,7 +149,7 @@ const assignmentSchema = new mongoose.Schema({
     status: {
         type: String,
     },
-    studentsSubmitted: [ [studentSchema] ] 
+    studentsSubmitted: [ studentSchema ] 
 });
 const submissionSchema = new mongoose.Schema({
    assignmentId: {
@@ -372,9 +372,26 @@ app.get("/student/Educafe/assignments",(req,res)=>{
         }
     });
 });
+app.get("/teacher/assignments/view/:id",async (req,res)=>{
+    const student = req.query.student;
+    const submission= await Submission.findOne({assignmentId:req.params.id,studentId:student});
+    if(submission){
+        res.redirect(`/${submission.fileName}`)
+    }
+    else
+    {
+        alert("User has not submitted");
+    }
+    
+
+    
+    });
+
 app.get("/student/Educafe/assignments/view/:id",async (req,res)=>{
     const student = req.session.user;
-    const submission= await Submission.find({assignmentId:req.params.id,studentId:student._id});
+    const submission= await Submission.findOne({assignmentId:req.params.id,studentId:student._id});
+    const obj=submission;
+
     Assignment.findById(req.params.id,(err,foundAssignment)=>{
         res.render("view_assignment_stu",{designation:"student",assignment:foundAssignment,curUser:student,submission:submission});});
     });
@@ -450,7 +467,11 @@ app.post("/teacher/Educafe/assignments/new", (req, res) => {
     });
 });
 
-app.get("")
+app.get("/teacher/Educafe/assignments/view/:id",async (req,res)=>{
+    const teacher = req.session.user;
+     Assignment.findById(req.params.id,(err,foundAssignment)=>{
+        res.render("view_assignment_teacher",{designation:"teacher",assignment:foundAssignment,curUser:teacher});});
+    });
 app.listen(3000, function(req, res) {
     console.log("The server is running at port 3000");
 });
