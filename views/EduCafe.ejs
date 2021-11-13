@@ -87,8 +87,8 @@
                                             </span>
                                         </div>
                                         <div class="flex-card-brother">
-                                            <form action = "/class" method = POST>
-                                                <button id="reg-btn" type="submit" value = <%=[item.meetlink, sid]%> name="atnBtn">Join Now</button>
+                                            <form action="/class" method="POST">
+                                                <button id="reg-btn" type="submit" value=<%=[item.meetlink, sid]%> name="atnBtn">Join Now</button>
                                             </form>
                                         </div>
                                     </div>
@@ -123,7 +123,10 @@
                                                 <div class="flex-card-brother">
                                                     <a href="<%=lec.meetlink%>" id="sch-btn">Join Now</a>
                                                     <div>
-                                                        <a href="/teacher/EduCafe/attendance" id="att-btn">View Attendance</a>                                                       
+                                                        <form action="/teacher/EduCafe/attendance" method="POST">
+                                                            <button type="submit" name="attenBtn" value=<%=lec.year%> id="sch-btn">View Attendance</button>
+                                                        </form>
+
                                                     </div>
                                                     <form action="/teacher/EduCafe/delete" method="POST">
                                                         <button id="sch-btn" value=<%=lec._id%> name="delbtn">Cancel Class</button>
