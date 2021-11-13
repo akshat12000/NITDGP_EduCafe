@@ -28,3 +28,6 @@ cross.addEventListener("click", function() {
         ham.classList.add("mydisp");
     }
 });
+document.getElementById('sch-btn').onclick = function() {
+    
+}

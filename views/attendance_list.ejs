@@ -1,0 +1,5 @@
+<%- include("partials/headerMain.ejs"); -%>
+<% attendancelist.forEach(function( eachPerson){ %>
+    <li>Name: <%= eachPerson.name %> <br> Roll: <%= eachPerson.roll %> </li>
+<% }) %>     
+<%- include("partials/footerMain.ejs"); -%>

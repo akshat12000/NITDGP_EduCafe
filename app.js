@@ -138,60 +138,80 @@ const assignmentSchema = new mongoose.Schema({
     },
 });
 
+const attendanceSchema = new mongoose.Schema({
+    username: {
+        type: String,
+        required: true
+    },
+    studentId: [
+        {
+            type: String,
+        }
+    ],
+    meetlink: {
+        type: String,
+        required: true
+    },
+});
+
+
+
 studentSchema.plugin(findOrCreate);
 studentSchema.plugin(passportLocalMongoose);
 teacherSchema.plugin(findOrCreate);
 teacherSchema.plugin(passportLocalMongoose);
 subjectSchema.plugin(findOrCreate);
 assignmentSchema.plugin(findOrCreate);
+attendanceSchema.plugin(findOrCreate);
 
 const Student = new mongoose.model("Student", studentSchema);
 const Teacher = new mongoose.model("Teacher", teacherSchema);
 const Subject = new mongoose.model("Subject", subjectSchema);
 const Assignment = new mongoose.model("Assignment", assignmentSchema);
+const Attendance = new mongoose.model("Attendance", attendanceSchema);
 
 authStudent.use(Student.createStrategy());
 
-authStudent.serializeUser(function(student, done) {
+authStudent.serializeUser(function (student, done) {
     done(null, student);
 });
 
-authStudent.deserializeUser(function(student, done) {
+authStudent.deserializeUser(function (student, done) {
     done(null, student);
 });
 
 authTeacher.use(Teacher.createStrategy());
 
-authTeacher.serializeUser(function(teacher, done) {
+authTeacher.serializeUser(function (teacher, done) {
     done(null, teacher);
 });
 
-authTeacher.deserializeUser(function(teacher, done) {
+authTeacher.deserializeUser(function (teacher, done) {
     done(null, teacher);
 });
 
-app.get("/", function(req, res) {
+app.get("/", function (req, res) {
     res.render("home");
 });
 
-app.get("/student", function(req, res) {
+app.get("/student", function (req, res) {
     res.render("subHome", { designation: "student" });
 });
 
-app.get("/teacher", function(req, res) {
+app.get("/teacher", function (req, res) {
 
     res.render("subHome", { designation: "teacher" });
 });
 
-app.get("/student/EduCafe", function(req, res) {
+app.get("/student/EduCafe", function (req, res) {
     var date = new Date().getDate();
     var today = new Date();
     var month = today.toLocaleString('default', { month: 'short' });
     if (req.isAuthenticated()) {
         var subList = req.user.subjects;
-        Subject.find({ $and: [{ name: { $in: subList } }, { year: req.user.year }] }, function(err, sub) {
+        Subject.find({ $and: [{ name: { $in: subList } }, { year: req.user.year }] }, function (err, sub) {
             if (!err) {
-                res.render("EduCafe", { designation: "student", date: date, month: month, subjectList: sub });
+                res.render("EduCafe", { designation: "student", date: date, month: month, subjectList: sub, sid: req.user._id });
                 // console.log(sub);
             } else {
                 console.log(err);
@@ -204,7 +224,7 @@ app.get("/student/EduCafe", function(req, res) {
     }
 });
 
-app.get("/student/Educafe/overview", function(req, res) {
+app.get("/student/Educafe/overview", function (req, res) {
     if (req.isAuthenticated()) {
         const studentInfo = {
             name: req.user.name,
@@ -220,7 +240,7 @@ app.get("/student/Educafe/overview", function(req, res) {
     }
 });
 
-app.get("/teacher/Educafe/overview", function(req, res) {
+app.get("/teacher/Educafe/overview", function (req, res) {
     if (req.isAuthenticated()) {
         const teacherInfo = {
             name: req.user.name,
@@ -234,20 +254,64 @@ app.get("/teacher/Educafe/overview", function(req, res) {
     }
 });
 
-app.get("/teacher/EduCafe", function(req, res) {
+app.get("/teacher/EduCafe", function (req, res) {
     var date = new Date().getDate();
     var today = new Date();
     var month = today.toLocaleString('default', { month: 'short' });
     if (req.isAuthenticated()) {
-        Subject.find({ $and: [{ name: req.user.subjects }, { teacherId: req.user._id }] }, function(err, subject) {
+        Subject.find({ $and: [{ name: req.user.subjects }, { teacherId: req.user._id }] }, function (err, subject) {
             res.render("EduCafe", { designation: "teacher", date: date, month: month, lecture: subject, name: req.user.name });
         });
     } else {
         res.redirect("/teacher");
     }
 });
+var data  = [];
+var obj = {};
+app.get("/teacher/Educafe/attendance", (req, res) => {
+    Attendance.find({}, 'studentId -_id', function (error, someValue) {
+        if (error) {
+            console.log(error);
+        } else {
+            var arr = someValue[0].studentId;                    
+            for (const value of arr.values(arr)) {
+                var studentId = value;
+                console.log(value);
+                Student.findById(studentId, function (err, ress) {
+                if (err) {
+                    console.log(err);
+                }
+                else {
+                    data.push({
+                    "name": ress.name,
+                    "roll": ress.roll,
+                }); 
+                console.log(data);                          
+            }
+        })
+    }
+    console.log(data);
+    res.render("attendance_list", {designation: "teacher", attendancelist: data});  
+}
+});
+})
 
-app.post("/teacher/EduCafe", function(req, res) {
+
+app.post("/class", function (req, res) {
+    const curId = req.body.atnBtn;
+    const meetlink = curId.slice(0, curId.indexOf(","));
+    const sid = curId.slice(curId.indexOf(",") + 1);
+    Attendance.updateOne({ username: meetlink }, { $push: { studentId: sid } }, function (err, attendance) {
+        if (err) {
+            console.log(err);
+        }
+        else {
+            res.redirect(meetlink);
+        }
+    });
+});
+
+app.post("/teacher/EduCafe", function (req, res) {
     const Ttime = new Date().getTime();
     const subject = new Subject({
         username: req.user.subjects + Ttime,
@@ -258,7 +322,18 @@ app.post("/teacher/EduCafe", function(req, res) {
         teacherName: req.user.name,
         meetlink: "https://meet.jit.si/" + req.user._id + "_" + req.body.year
     });
-    subject.save(function(err) {
+    const meetlink = "https://meet.jit.si/" + req.user._id + "_" + req.body.year;
+    const attendance = new Attendance({
+        username: meetlink,
+        studentId: [],
+        meetlink: meetlink,
+    });
+    attendance.save(function (err) {
+        if (err) {
+            console.log(err);
+        }
+    });
+    subject.save(function (err) {
         if (err) {
             console.log(err);
         } else {
@@ -267,9 +342,9 @@ app.post("/teacher/EduCafe", function(req, res) {
     });
 });
 
-app.post("/teacher/EduCafe/delete", function(req, res) {
+app.post("/teacher/EduCafe/delete", function (req, res) {
     const currentId = req.body.delbtn;
-    Subject.findByIdAndRemove(currentId, function(err) {
+    Subject.findByIdAndRemove(currentId, function (err) {
         if (!err) {
             console.log("Item Deleted Successfully!");
             res.redirect("/teacher/EduCafe");
@@ -277,34 +352,34 @@ app.post("/teacher/EduCafe/delete", function(req, res) {
     });
 });
 
-app.get("/teacher/EduCafe/schedule", function(req, res) {
+app.get("/teacher/EduCafe/schedule", function (req, res) {
     res.render("schedule_class", { designation: "teacher" });
 });
 
-app.get("/student/login", function(req, res) {
+app.get("/student/login", function (req, res) {
     res.render("login", { designation: "student" });
 });
 
-app.get("/student/register", function(req, res) {
+app.get("/student/register", function (req, res) {
     res.render("register", { designation: "student" });
 });
 
-app.get("/teacher/login", function(req, res) {
+app.get("/teacher/login", function (req, res) {
     res.render("login", { designation: "teacher" });
 });
 
-app.get("/teacher/register", function(req, res) {
+app.get("/teacher/register", function (req, res) {
     res.render("register", { designation: "teacher" });
 });
 
-app.post("/student/register", function(req, res) {
+app.post("/student/register", function (req, res) {
 
-    Student.register({ name: req.body.name, username: req.body.username, contact: req.body.contact, year: req.body.year, roll: req.body.roll, subjects: req.body.subjects }, req.body.password, function(err, student) {
+    Student.register({ name: req.body.name, username: req.body.username, contact: req.body.contact, year: req.body.year, roll: req.body.roll, subjects: req.body.subjects }, req.body.password, function (err, student) {
         if (err) {
             console.log(err);
             res.redirect("/student/register");
         } else {
-            authStudent.authenticate("local")(req, res, function() {
+            authStudent.authenticate("local")(req, res, function () {
                 res.redirect("/student/EduCafe");
             });
         }
@@ -312,14 +387,14 @@ app.post("/student/register", function(req, res) {
 
 });
 
-app.post("/teacher/register", function(req, res) {
+app.post("/teacher/register", function (req, res) {
 
-    Teacher.register({ name: req.body.name, username: req.body.username, contact: req.body.contact, subjects: req.body.subjects }, req.body.password, function(err, teacher) {
+    Teacher.register({ name: req.body.name, username: req.body.username, contact: req.body.contact, subjects: req.body.subjects }, req.body.password, function (err, teacher) {
         if (err) {
             console.log(err);
             res.redirect("/teacher/register");
         } else {
-            authTeacher.authenticate("local")(req, res, function() {
+            authTeacher.authenticate("local")(req, res, function () {
                 res.redirect("/teacher/EduCafe");
             });
         }
@@ -327,43 +402,43 @@ app.post("/teacher/register", function(req, res) {
 });
 
 
-app.get("/student/logout", function(req, res) {
+app.get("/student/logout", function (req, res) {
     req.logout();
     res.redirect("/");
 });
 
-app.get("/teacher/logout", function(req, res) {
+app.get("/teacher/logout", function (req, res) {
     req.logout();
     res.redirect("/");
 });
 
-app.post("/student/login", function(req, res) {
+app.post("/student/login", function (req, res) {
 
     const student = new Student({
         username: req.body.username,
         password: req.body.password
     });
-    req.logIn(student, function(err) {
+    req.logIn(student, function (err) {
         if (err) {
             console.log(err);
         } else {
-            authStudent.authenticate('local')(req, res, function() {
+            authStudent.authenticate('local')(req, res, function () {
                 res.redirect("/student/EduCafe");
             });
         }
     });
 });
 
-app.post("/teacher/login", function(req, res) {
+app.post("/teacher/login", function (req, res) {
     const teacher = new Teacher({
         username: req.body.username,
         password: req.body.password
     });
-    req.logIn(teacher, function(err) {
+    req.logIn(teacher, function (err) {
         if (err) {
             console.log(err);
         } else {
-            authTeacher.authenticate("local")(req, res, function() {
+            authTeacher.authenticate("local")(req, res, function () {
                 res.redirect("/teacher/EduCafe");
             });
         }
@@ -412,7 +487,7 @@ app.post("/teacher/Educafe/assignments/new", (req, res) => {
         question: req.body.question,
         endTime: req.body.endTime,
     });
-    newAssignment.save(function(err) {
+    newAssignment.save(function (err) {
         if (err) {
             console.log(err);
         } else {
@@ -421,6 +496,6 @@ app.post("/teacher/Educafe/assignments/new", (req, res) => {
     });
 });
 
-app.listen(3000, function(req, res) {
+app.listen(3000, function (req, res) {
     console.log("The server is running at port 3000");
 });
