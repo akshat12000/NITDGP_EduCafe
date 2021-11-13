@@ -287,6 +287,17 @@ app.post("/teacher/Educafe/attendance", (req, res) => {
 
 });
 
+app.post("/teacher/EduCafe/endclass", function(req, res){
+    const meetlink = req.body.deletbtn;
+    Attendance.findOneAndRemove({meetlink:meetlink}, function(err){
+        if(err){
+            console.log(err);
+        }else{
+             res.redirect("/teacher/EduCafe");
+        }
+    })
+});
+
 
 app.post("/class", function(req, res) {
     const curId = req.body.atnBtn;

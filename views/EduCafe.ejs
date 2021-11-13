@@ -87,8 +87,8 @@
                                             </span>
                                         </div>
                                         <div class="flex-card-brother">
-                                            <form action="/class" method="POST">
-                                                <button id="reg-btn" type="submit" value=<%=[item.meetlink, sid]%> name="atnBtn">Join Now</button>
+                                            <form action = "/class" method = POST>
+                                                <button id="reg-btn" type="submit" value = <%=[item.meetlink, sid]%> name="atnBtn">Join Now</button>
                                             </form>
                                         </div>
                                     </div>
@@ -125,11 +125,13 @@
                                                     <div>
                                                         <form action="/teacher/EduCafe/attendance" method="POST">
                                                             <button type="submit" name="attenBtn" value=<%=lec.year%> id="sch-btn">View Attendance</button>
-                                                        </form>
-
+                                                        </form>                                                       
                                                     </div>
                                                     <form action="/teacher/EduCafe/delete" method="POST">
                                                         <button id="sch-btn" value=<%=lec._id%> name="delbtn">Cancel Class</button>
+                                                    </form>
+                                                    <form action="/teacher/EduCafe/endclass" method="POST">
+                                                        <button id="sch-btn" value=<%=lec.meetlink%> name="deletbtn">End Class</button>
                                                     </form>
                                                 </div>
                                             </div>
