@@ -121,7 +121,10 @@
                                                     </p>
                                                 </div>
                                                 <div class="flex-card-brother">
-                                                    <a href="<%=lec.meetlink%>" id="sch-btn">Join Now</a>
+                                                    <form action="/teacher/class" method="POST">
+                                                        <button type="submit" name="teachBtn" value=<%=lec.meetlink%> id="reg-btn">Join Now</button>
+                                                    </form>
+
                                                     <div>
                                                         <form action="/teacher/EduCafe/attendance" method="POST">
                                                             <button type="submit" name="attenBtn" value=<%=lec.year%> id="sch-btn">View Attendance</button>

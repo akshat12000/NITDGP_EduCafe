@@ -10,6 +10,7 @@ const passport = require("passport");
 const authStudent = new passport.Passport();
 const authTeacher = new passport.Passport();
 const passportLocalMongoose = require("passport-local-mongoose");
+const { json } = require("body-parser");
 
 const app = express();
 
@@ -291,11 +292,27 @@ app.post("/class", function(req, res) {
     const curId = req.body.atnBtn;
     const meetlink = curId.slice(0, curId.indexOf(","));
     const sid = curId.slice(curId.indexOf(",") + 1);
-    Attendance.updateOne({ username: meetlink }, { $addToSet: { studentId: { id: sid, name: req.user.name, roll: req.user.roll } } }, function(err, attendance) {
+    Attendance.findOne({ username: meetlink }, function(err, attendance) {
         if (err) {
             console.log(err);
         } else {
-            res.redirect(meetlink);
+            const student = { id: sid, name: req.user.name, roll: req.user.roll };
+            var present = false;
+            for (var i = 0; i < attendance.studentId.length; i++) {
+                var compObj = { id: attendance.studentId[i].id, name: attendance.studentId[i].name, roll: attendance.studentId[i].roll };
+                if (JSON.stringify(student) === JSON.stringify(compObj)) {
+                    present = true;
+                    break;
+                }
+            }
+            if (!present) {
+                Attendance.updateOne({ username: meetlink }, { $addToSet: { studentId: { id: sid, name: req.user.name, roll: req.user.roll } } }, function(bug, attn) {
+                    if (bug) {
+                        console.log(bug);
+                    }
+                });
+            }
+            res.render("class", { meet: meetlink, designation: "student" });
         }
     });
 });
@@ -329,6 +346,10 @@ app.post("/teacher/EduCafe", function(req, res) {
             res.redirect("/teacher/EduCafe");
         }
     });
+});
+
+app.post("/teacher/class", function(req, res) {
+    res.render("class", { designation: "teacher", meet: req.body.teachBtn });
 });
 
 app.post("/teacher/EduCafe/delete", function(req, res) {
