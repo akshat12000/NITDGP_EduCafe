@@ -127,20 +127,6 @@
                             <strong>Student Name:</strong>
                             <%=student.name%>
                         </div>
-                        <!-- <ul class="list-group list-group-flush">
-                            <li class="list-group-item"><strong>Subject Name:</strong>
-                                <%=item.subjectName%>
-                            </li>
-                            <li class="list-group-item"><strong>Year:</strong>
-                                <%=item.year%>
-                            </li>
-                            <li class="list-group-item"><strong>Question:</strong>
-                                <%=item.question%>
-                            </li>
-                            <li class="list-group-item"><strong>End Time:</strong>
-                                <%=item.endTime%>
-                            </li>
-                        </ul> -->
                         <form action="/teacher/assignments/view/<%=assignment._id%>" method="get">
                             <input type="hidden" name="student" value="<%=student._id%>" />
                             <button type="submit"   style="margin:auto;">View Assignment</button>

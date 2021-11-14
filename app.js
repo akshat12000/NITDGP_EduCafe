@@ -180,17 +180,7 @@ app.get("/", function(req, res) {
     res.render("home");
 });
 
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-      cb(null, "uploads/")
-    },
-    filename: (req, file, cb) => {
-      cb(null, Date.now() + "-" + file.originalname)
-    },
-  })
 
-  
-const uploadStorage = multer({ storage: storage })
 
 
 const multerStorage = multer.diskStorage({
@@ -403,7 +393,7 @@ app.get("/student/Educafe/assignments/view/:id",async (req,res)=>{
         try {
             const newFile = await File.create({
               name: req.file.filename,
-            });
+            }); 
             await Assignment.findByIdAndUpdate({_id:obj.assignment}, { $push: { studentsSubmitted: student } });
             await Submission.create({studentId:student._id,assignmentId:obj.assignment,fileName:req.file.filename});
 
