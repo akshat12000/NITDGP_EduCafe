@@ -287,18 +287,6 @@ app.post("/teacher/Educafe/attendance", (req, res) => {
 
 });
 
-app.post("/teacher/EduCafe/endclass", function(req, res){
-    const meetlink = req.body.deletbtn;
-    Attendance.findOneAndRemove({meetlink:meetlink}, function(err){
-        if(err){
-            console.log(err);
-        }else{
-             res.redirect("/teacher/EduCafe");
-        }
-    })
-});
-
-
 app.post("/class", function(req, res) {
     const curId = req.body.atnBtn;
     const meetlink = curId.slice(0, curId.indexOf(","));
@@ -344,10 +332,18 @@ app.post("/teacher/EduCafe", function(req, res) {
 });
 
 app.post("/teacher/EduCafe/delete", function(req, res) {
-    const currentId = req.body.delbtn;
+    const vals = req.body.delbtn;
+    const currentId = vals.slice(0, vals.indexOf(","));
     Subject.findByIdAndRemove(currentId, function(err) {
         if (!err) {
             console.log("Item Deleted Successfully!");
+        }
+    });
+    const meetlink = vals.slice(vals.indexOf(",") + 1);
+    Attendance.findOneAndRemove({ meetlink: meetlink }, function(err) {
+        if (err) {
+            console.log(err);
+        } else {
             res.redirect("/teacher/EduCafe");
         }
     });
