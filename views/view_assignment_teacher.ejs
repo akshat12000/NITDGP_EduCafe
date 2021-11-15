@@ -1,23 +1,22 @@
 <%- include("partials/headerMain.ejs"); -%>
 
-<body>
-  <!--- This is the overlay div when it will be active when we will toggle the navbar in mobile device --->
-  <div class="overlay againdisp"></div>
-  <!--- This the Nav Bar --->
-  <div class="main-content">
-    <div class="navbar active">
-      <!--- This is the NavBar Brand saying "GatherUp!" --->
-      <div class="nav-brand">
-        <h1>EduCafé</h1>
-        <span class="mycross fa fa-times againdisp"></span>
-      </div>
-      <!--- Nav Items --->
-      <div class="nav-items">
-        <% if(designation==="student"){%>
-          <ul>
-            <li>
-              <a href="/student/EduCafe/overview"
-              ><i class="fa fa-bar-chart-o menu"></i>Overview</a
+    <body>
+        <!--- This is the overlay div when it will be active when we will toggle the navbar in mobile device --->
+        <div class="overlay againdisp"></div>
+        <!--- This the Nav Bar --->
+        <div class="main-content">
+            <div class="navbar active">
+                <!--- This is the NavBar Brand saying "GatherUp!" --->
+                <div class="nav-brand">
+                    <h1>EduCafé</h1>
+                    <span class="mycross fa fa-times againdisp"></span>
+                </div>
+                <!--- Nav Items --->
+                <div class="nav-items">
+                    <% if(designation==="student"){%>
+                        <ul>
+                            <li>
+                                <a href="/student/EduCafe/overview"><i class="fa fa-bar-chart-o menu"></i>Overview</a
               >
             </li>
             <li>
@@ -27,10 +26,9 @@
             </li>
             <li>
               <a href="#"><i class="fa fa-book menu"></i>Materials</a>
-            </li>
-            <li class="menu-ex">
-              <a href="/student/EduCafe/assignments"
-              ><i class="fa fa-bookmark-o menu-ex-li"></i>Assignments</a
+                            </li>
+                            <li class="menu-ex">
+                                <a href="/student/EduCafe/assignments"><i class="fa fa-bookmark-o menu-ex-li"></i>Assignments</a
               >
             </li>
           </ul>
@@ -93,50 +91,51 @@
                 <!--- Notification and User Icons --->
                 <div class="user-disp">
                   <a href="#" class="fa fa-bell-o bell-icon"></a>&nbsp;&nbsp&nbsp;
-                  <a href="#" class="fa fa-user-circle user-icon"></a>
+                                <a href="#" class="fa fa-user-circle user-icon"></a>
                 </div>
-              </div>
-              <%const item= assignment%>
-              <div style="width: 18rem; margin: 1% auto">
-                <div class="card-header">
-                  <strong>Teacher Name:</strong>
-                  <%=item.teacherName%>
-                </div>
-                <ul class="list-group list-group-flush">
-                  <li class="list-group-item">
-                    <strong>Subject Name:</strong>
-                    <%=item.subjectName%>
-                  </li>
-                  <li class="list-group-item">
-                    <strong>Year:</strong>
-                    <%=item.year%>
-                  </li>
-                  <li class="list-group-item">
-                    <strong>Question:</strong>
-                    <%=item.question%>
-                  </li>
-                  <li class="list-group-item">
-                    <strong>End Time:</strong>
-                    <%=item.endTime%>
-                  </li>
-                </ul>
-                <%const students= assignment.studentsSubmitted%>
-                <%students.forEach((student)=>{ %>
-                    <div  style="width: 18rem; margin:1% auto">
+            </div>
+            <div class="assignment-container">
+                <%const item= assignment%>
+                    <div class="assignment-card-container" style="width: 18rem; margin: 2%">
                         <div class="card-header">
-                            <strong>Student Name:</strong>
-                            <%=student.name%>
+                            <strong>Teacher Name:</strong>
+                            <%=item.teacherName%>
                         </div>
-                        <form action="/teacher/assignments/view/<%=assignment._id%>" method="get">
-                            <input type="hidden" name="student" value="<%=student._id%>" />
-                            <button type="submit"   style="margin:auto;">View Assignment</button>
-                        </form>
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item">
+                                <strong>Subject Name:</strong>
+                                <%=item.subjectName%>
+                            </li>
+                            <li class="list-group-item">
+                                <strong>Year:</strong>
+                                <%=item.year%>
+                            </li>
+                            <li class="list-group-item">
+                                <strong>Question:</strong>
+                                <%=item.question%>
+                            </li>
+                            <li class="list-group-item">
+                                <strong>End Time:</strong>
+                                <%=item.endTime%>
+                            </li>
+                        </ul>
+                        <%const students= assignment.studentsSubmitted%>
+                            <%students.forEach((student)=>{ %>
+                                <div style="width: 15rem; margin:1% auto">
+                                    <div class="card-header">
+                                        <strong>Student Name:</strong>
+                                        <%=student.name%>
+                                    </div>
+                                    <form action="/teacher/assignments/view/<%=assignment._id%>" method="get">
+                                        <input type="hidden" name="student" value="<%=student._id%>" />
+                                        <button type="submit" style="margin:1%" id="reg-btn">View Assignment</button>
+                                    </form>
+                                </div>
+                                <% }); %>
                     </div>
-                        <% }); %>
             </div>
 
-          </div>
         </div>
-      </body>
-      <%- include("partials/footerMain.ejs"); -%>
-      
+        </div>
+    </body>
+    <%- include("partials/footerMain.ejs"); -%>
