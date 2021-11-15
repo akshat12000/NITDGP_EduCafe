@@ -357,3 +357,13 @@ li {
     border: 1px dotted #888;
     border-radius: 5px;
 }
+
+.poll-form {
+    display: flex;
+}
+
+.poll-form input {
+    display: inline-block;
+    width: 2vw;
+    margin-top: 4.5%;
+}

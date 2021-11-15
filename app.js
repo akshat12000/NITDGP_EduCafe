@@ -16,6 +16,7 @@ const File = require("./models/fileSchema");
 const Subject = require("./models/subjectSchema");
 const Attendance = require("./models/attendanceSchema");
 const Submission = require("./models/submissionSchema");
+const Poll = require("./models/pollSchema");
 const app = express();
 
 app.set('view engine', 'ejs');
@@ -498,7 +499,7 @@ app.post("/teacher/Educafe/assignments/new", (req, res) => {
 });
 
 app.get("/student/Educafe/assignments", (req, res) => {
-    const student = req.session.user;
+    const student = req.user;
 
     Assignment.find({ year: student.year }, (err, foundAssignments) => {
         if (err) {
@@ -585,6 +586,102 @@ app.get("/teacher/Educafe/assignments/view/:id", async(req, res) => {
         res.render("view_assignment_teacher", { designation: "teacher", assignment: foundAssignment, curUser: teacher });
     });
 });
+
+app.get("/student/Educafe/polls/view/:id", function(req, res) {
+    if (req.isAuthenticated()) {
+        Poll.findById(req.params.id, function(err, foundPoll) {
+            res.render("view_poll_student", { designation: "student", poll: foundPoll });
+        });
+    } else {
+        res.redirect("/student");
+    }
+});
+
+app.post("/student/EduCafe/polls/submit", async(req, res) => {
+    const pollChoosen = req.body.poll_res;
+    const pollId = req.body.pollBtn;
+    const optionVal = pollChoosen.slice(0, pollChoosen.indexOf(","));
+    const optionNo = pollChoosen.slice(pollChoosen.indexOf(",") + 1);
+    const responseStu = await Poll.findById(pollId);
+    if (responseStu.option1.val === optionVal) {
+        responseStu.option1.response.push(req.user._id);
+    } else if (responseStu.option2.val === optionVal) {
+        responseStu.option2.response.push(req.user._id);
+    } else {
+        res.redirect("/student/Educafe/polls/view/" + pollId);
+    }
+    responseStu.save((err) => {
+        if (err) {
+            console.log(err);
+        } else {
+            res.redirect("/student/Educafe/polls");
+        }
+    });
+});
+
+app.get("/student/EduCafe/polls", function(req, res) {
+    if (req.isAuthenticated()) {
+        const student = req.user;
+        Poll.find({ year: student.year }, (err, foundPolls) => {
+            if (err) {
+                console.log(err);
+            } else {
+
+                res.render("polls_stu", { designation: "student", polls: foundPolls, curUser: student });
+            }
+        });
+    } else {
+        res.redirect("/student");
+    }
+});
+
+app.get("/teacher/EduCafe/polls/view/:id", function(req, res) {
+    if (req.isAuthenticated()) {
+        const teacher = req.user;
+        Poll.findById(req.params.id, (err, foundPoll) => {
+            res.render("view_poll_teacher", { designation: "teacher", poll: foundPoll, curUser: teacher });
+        });
+    } else {
+        res.redirect("/teacher");
+    }
+});
+
+app.get("/teacher/EduCafe/polls/new", function(req, res) {
+    const Id = req.user._id;
+    res.render("poll_new", { designation: "teacher" });
+});
+app.post("/teacher/EduCafe/polls/new", function(req, res) {
+    const Ttime = new Date().getTime();
+    const newPoll = new Poll({
+        username: req.user.subjects + Ttime,
+        teacherId: req.user._id,
+        teacherName: req.body.teacherName,
+        subjectName: req.user.subjects,
+        year: req.body.year,
+        question: req.body.question,
+        option1: { val: req.body.option1, response: [] },
+        option2: { val: req.body.option2, response: [] }
+    });
+    newPoll.save(function(err) {
+        if (err) {
+            console.log(err);
+        } else {
+            res.redirect("/teacher/EduCafe/polls");
+        }
+    });
+});
+
+app.get("/teacher/EduCafe/polls", function(req, res) {
+    if (req.isAuthenticated()) {
+        const teacherId = req.user._id;
+        Poll.find({ teacherId: teacherId }, function(err, foundPolls) {
+            res.render("polls_teach", { designation: "teacher", polls: foundPolls });
+        });
+    } else {
+        res.redirect("/teacher");
+    }
+});
+
 app.listen('3000', function(req, res) {
     console.log("Started at port 3000");
 });
