@@ -61,36 +61,37 @@
                 </div>
 
                 <form action="/teacher/Educafe/assignments/new" method="get">
-                    <button type="submit">New Assignment</button>
+                    <button type="submit">New Assignemnt</button>
                 </form>
-                <div class="assignment-container">
-                    <%assignments.forEach((item)=>{ %>
-                        <div class="assignment-card-container" style="width: 18rem; margin:1% 3%">
-                            <div class="card-header">
-                                <strong>Teacher Name:</strong>
-                                <%=item.teacherName%>
-                            </div>
-                            <ul class="list-group list-group-flush">
-                                <li class="list-group-item"><strong>Subject Name:</strong>
-                                    <%=item.subjectName%>
-                                </li>
-                                <li class="list-group-item"><strong>Year:</strong>
-                                    <%=item.year%>
-                                </li>
-                                <li class="list-group-item"><strong>Question:</strong>
-                                    <%=item.question%>
-                                </li>
-                                <li class="list-group-item"><strong>End Time:</strong>
-                                    <%=item.endTime%>
-                                </li>
-                            </ul>
-                            <form action="/delete" method="post">
-                                <button id="reg-btn" type="submit" style="margin:auto;">View Assignment</button>
-                            </form>
+                <%assignments.forEach((item)=>{ %>
+                    <div style="width: 18rem; margin:1% auto">
+                        <div class="card-header">
+                            <strong>Teacher Name:</strong>
+                            <%=item.teacherName%>
                         </div>
-                        <% }); %>
-                </div>
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item"><strong>Subject Name:</strong>
+                                <%=item.subjectName%>
+                            </li>
+                            <li class="list-group-item"><strong>Year:</strong>
+                                <%=item.year%>
+                            </li>
+                            <li class="list-group-item"><strong>Question:</strong>
+                                <%=item.question%>
+                            </li>
+                            <li class="list-group-item"><strong>End Time:</strong>
+                                <%=item.endTime%>
+                            </li>
+                        </ul>
+                        <form action="/teacher/Educafe/assignments/view/<%=item._id%>" method="get">
+                            <button type="submit" style="margin:auto;">View Assignment</button>
+                        </form>
+                    </div>
+                    <% }); %>
             </div>
+
+
+        </div>
         </div>
 
 

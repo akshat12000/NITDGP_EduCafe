@@ -5,13 +5,14 @@ const bodyParser = require("body-parser");
 const ejs = require("ejs");
 const mongoose = require("mongoose");
 const session = require("express-session");
+const MongoDBStore = require('connect-mongodb-session')(session);
 const findOrCreate = require("mongoose-findorcreate");
 const passport = require("passport");
 const authStudent = new passport.Passport();
 const authTeacher = new passport.Passport();
 const passportLocalMongoose = require("passport-local-mongoose");
-const { json } = require("body-parser");
-
+const multer = require("multer");
+const File = require("./model/fileSchema");
 const app = express();
 
 app.set('view engine', 'ejs');
@@ -23,7 +24,7 @@ app.use(express.static("public"));
 app.use(session({
     secret: process.env.SECRET,
     resave: false,
-    saveUninitialized: false
+    saveUninitialized: false,
 }));
 
 app.use(authStudent.initialize());
@@ -137,6 +138,10 @@ const assignmentSchema = new mongoose.Schema({
         type: Date,
         required: true
     },
+    status: {
+        type: String,
+    },
+    studentsSubmitted: [studentSchema]
 });
 
 const attendanceSchema = new mongoose.Schema({
@@ -163,9 +168,17 @@ const attendanceSchema = new mongoose.Schema({
         required: true
     },
 });
-
-
-
+const submissionSchema = new mongoose.Schema({
+    assignmentId: {
+        type: String,
+    },
+    studentId: {
+        type: String,
+    },
+    fileName: {
+        type: String,
+    }
+});
 studentSchema.plugin(findOrCreate);
 studentSchema.plugin(passportLocalMongoose);
 teacherSchema.plugin(findOrCreate);
@@ -173,12 +186,14 @@ teacherSchema.plugin(passportLocalMongoose);
 subjectSchema.plugin(findOrCreate);
 assignmentSchema.plugin(findOrCreate);
 attendanceSchema.plugin(findOrCreate);
+submissionSchema.plugin(findOrCreate);
 
 const Student = new mongoose.model("Student", studentSchema);
 const Teacher = new mongoose.model("Teacher", teacherSchema);
 const Subject = new mongoose.model("Subject", subjectSchema);
 const Assignment = new mongoose.model("Assignment", assignmentSchema);
 const Attendance = new mongoose.model("Attendance", attendanceSchema);
+const Submission = new mongoose.model("Submission", submissionSchema);
 
 authStudent.use(Student.createStrategy());
 
@@ -204,6 +219,32 @@ app.get("/", function(req, res) {
     res.render("home");
 });
 
+const multerStorage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, "public");
+    },
+    filename: (req, file, cb) => {
+        const ext = file.mimetype.split("/")[1];
+        cb(null, `files/admin-${file.fieldname}-${Date.now()}.${ext}`);
+    },
+});
+
+const multerFilter = (req, file, cb) => {
+    if (file.mimetype.split("/")[1] === "pdf") {
+        cb(null, true);
+    } else {
+        cb(new Error("Not a PDF File!!"), false);
+    }
+};
+
+const upload = multer({
+    storage: multerStorage,
+    fileFilter: multerFilter,
+});
+
+app.get("/storage_check", (req, res) => {
+    res.render("storage_check");
+})
 app.get("/student", function(req, res) {
     res.render("subHome", { designation: "student" });
 });
@@ -391,7 +432,6 @@ app.get("/teacher/register", function(req, res) {
 });
 
 app.post("/student/register", function(req, res) {
-
     Student.register({ name: req.body.name, username: req.body.username, contact: req.body.contact, year: req.body.year, roll: req.body.roll, subjects: req.body.subjects }, req.body.password, function(err, student) {
         if (err) {
             console.log(err);
@@ -401,8 +441,8 @@ app.post("/student/register", function(req, res) {
                 res.redirect("/student/EduCafe");
             });
         }
-    });
 
+    });
 });
 
 app.post("/teacher/register", function(req, res) {
@@ -465,7 +505,17 @@ app.post("/teacher/login", function(req, res) {
 
 app.get("/student/Educafe/assignments", (req, res) => {
     if (req.isAuthenticated()) {
-        res.render("assignments_stu", { designation: "student" });
+
+        const student = req.user;
+
+        Assignment.find({ year: student.year }, (err, foundAssignments) => {
+            if (err) {
+                console.log(err);
+            } else {
+
+                res.render("assignments_stu", { designation: "student", assignments: foundAssignments, curUser: student });
+            }
+        });
     } else {
         res.redirect("/student");
     }
@@ -484,6 +534,7 @@ app.get("/teacher/Educafe/assignments", (req, res) => {
     } else {
         res.redirect("/teacher");
     }
+
 });
 
 app.get("/teacher/Educafe/assignments/new", (req, res) => {
@@ -504,6 +555,7 @@ app.post("/teacher/Educafe/assignments/new", (req, res) => {
         year: req.body.year,
         question: req.body.question,
         endTime: req.body.endTime,
+        status: "assigned"
     });
     newAssignment.save(function(err) {
         if (err) {
@@ -514,6 +566,94 @@ app.post("/teacher/Educafe/assignments/new", (req, res) => {
     });
 });
 
-app.listen(3000, function(req, res) {
-    console.log("The server is running at port 3000");
+app.get("/student/Educafe/assignments", (req, res) => {
+    const student = req.session.user;
+
+    Assignment.find({ year: student.year }, (err, foundAssignments) => {
+        if (err) {
+            console.log(err);
+        } else {
+
+            res.render("assignments_stu", { designation: "student", assignments: foundAssignments, curUser: student });
+        }
+    });
+});
+app.get("/teacher/assignments/view/:id", async(req, res) => {
+    const student = req.query.student;
+    const submission = await Submission.findOne({ assignmentId: req.params.id, studentId: student });
+    if (submission) {
+        res.redirect(`/${submission.fileName}`)
+    } else {
+        alert("User has not submitted");
+    }
+});
+
+app.get("/student/Educafe/assignments/view/:id", async(req, res) => {
+    const student = req.user;
+    const submission = await Submission.findOne({ assignmentId: req.params.id, studentId: student._id });
+    const obj = submission;
+
+    Assignment.findById(req.params.id, (err, foundAssignment) => {
+        res.render("view_assignment_stu", { designation: "student", assignment: foundAssignment, curUser: student, submission: submission });
+    });
+});
+
+
+app.post("/api/uploadFile", upload.single("myFile"), async(req, res) => {
+    const student = req.user;
+    const obj = req.body;
+    try {
+        const newFile = await File.create({
+            name: req.file.filename,
+        });
+        await Assignment.findByIdAndUpdate({ _id: obj.assignment }, { $push: { studentsSubmitted: student } });
+        await Submission.create({ studentId: student._id, assignmentId: obj.assignment, fileName: req.file.filename });
+
+        res.redirect("/student/Educafe/assignments");
+    } catch (error) {
+        console.log(error);
+    }
+
+});
+
+app.get("/api/getFiles", async(req, res) => {
+    try {
+        const files = await File.find();
+        res.status(200).json({
+            status: "success",
+            files,
+        });
+    } catch (error) {
+        res.json({
+            status: "Fail",
+            error,
+        });
+    }
+});
+
+app.get("/teacher/Educafe/assignments", (req, res) => {
+
+    const teacherId = req.user._id;
+    Assignment.find({ teacherId: teacherId }, (err, foundAssignments) => {
+        if (err) {
+            console.log(err);
+        } else {
+            res.render("assignments_teach", { designation: "teacher", assignments: foundAssignments });
+        }
+    });
+});
+
+app.get("/teacher/Educafe/assignments/new", (req, res) => {
+    const nt = req.user._id;
+    res.render("assignment_new", { designation: "teacher" });
+});
+
+app.get("/teacher/Educafe/assignments/view/:id", async(req, res) => {
+    const teacher = req.user;
+    Assignment.findById(req.params.id, (err, foundAssignment) => {
+        res.render("view_assignment_teacher", { designation: "teacher", assignment: foundAssignment, curUser: teacher });
+    });
+});
+app.listen('3000', function(req, res) {
+    console.log("Running");
 });
