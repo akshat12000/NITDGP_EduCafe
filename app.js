@@ -12,7 +12,10 @@ const authStudent = new passport.Passport();
 const authTeacher = new passport.Passport();
 const passportLocalMongoose = require("passport-local-mongoose");
 const multer = require("multer");
-const File = require("./model/fileSchema");
+const File = require("./models/fileSchema");
+const Subject = require("./models/subjectSchema");
+const Attendance = require("./models/attendanceSchema");
+const Submission = require("./models/submissionSchema");
 const app = express();
 
 app.set('view engine', 'ejs');
@@ -34,37 +37,6 @@ app.use(authTeacher.initialize());
 app.use(authTeacher.session());
 
 mongoose.connect('mongodb://' + process.env.DB_USERNAME + ':' + process.env.DB_PASSWORD + '@dbaas253.hyperp-dbaas.cloud.ibm.com:30055,dbaas254.hyperp-dbaas.cloud.ibm.com:30906,dbaas255.hyperp-dbaas.cloud.ibm.com:30666/admin?replicaSet=IBM', { useNewUrlParser: true, useUnifiedTopology: true, ssl: true, sslValidate: true, sslCA: process.env.CERTI_FILE });
-
-const subjectSchema = new mongoose.Schema({
-    username: {
-        type: String,
-        required: true
-    },
-    name: {
-        type: String,
-        required: true
-    },
-    year: {
-        type: String,
-        require: true
-    },
-    teacherId: {
-        type: String,
-        required: true
-    },
-    teacherName: {
-        type: String,
-        required: true
-    },
-    time: {
-        type: String,
-        required: true
-    },
-    meetlink: {
-        type: String,
-        required: true
-    }
-});
 
 const studentSchema = new mongoose.Schema({
     name: {
@@ -144,56 +116,15 @@ const assignmentSchema = new mongoose.Schema({
     studentsSubmitted: [studentSchema]
 });
 
-const attendanceSchema = new mongoose.Schema({
-    username: {
-        type: String,
-        required: true
-    },
-    studentId: [{
-        id: {
-            type: String,
-            required: true
-        },
-        name: {
-            type: String,
-            required: true
-        },
-        roll: {
-            type: String,
-            required: true
-        }
-    }],
-    meetlink: {
-        type: String,
-        required: true
-    },
-});
-const submissionSchema = new mongoose.Schema({
-    assignmentId: {
-        type: String,
-    },
-    studentId: {
-        type: String,
-    },
-    fileName: {
-        type: String,
-    }
-});
 studentSchema.plugin(findOrCreate);
 studentSchema.plugin(passportLocalMongoose);
 teacherSchema.plugin(findOrCreate);
 teacherSchema.plugin(passportLocalMongoose);
-subjectSchema.plugin(findOrCreate);
 assignmentSchema.plugin(findOrCreate);
-attendanceSchema.plugin(findOrCreate);
-submissionSchema.plugin(findOrCreate);
 
 const Student = new mongoose.model("Student", studentSchema);
 const Teacher = new mongoose.model("Teacher", teacherSchema);
-const Subject = new mongoose.model("Subject", subjectSchema);
 const Assignment = new mongoose.model("Assignment", assignmentSchema);
-const Attendance = new mongoose.model("Attendance", attendanceSchema);
-const Submission = new mongoose.model("Submission", submissionSchema);
 
 authStudent.use(Student.createStrategy());
 
@@ -655,5 +586,5 @@ app.get("/teacher/Educafe/assignments/view/:id", async(req, res) => {
     });
 });
 app.listen('3000', function(req, res) {
-    console.log("Running");
+    console.log("Started at port 3000");
 });
