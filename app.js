@@ -499,37 +499,48 @@ app.post("/teacher/Educafe/assignments/new", (req, res) => {
 });
 
 app.get("/student/Educafe/assignments", (req, res) => {
-    const student = req.user;
+    if (req.isAuthenticated()) {
+        const student = req.user;
 
-    Assignment.find({ year: student.year }, (err, foundAssignments) => {
-        if (err) {
-            console.log(err);
-        } else {
+        Assignment.find({ year: student.year }, (err, foundAssignments) => {
+            if (err) {
+                console.log(err);
+            } else {
 
-            res.render("assignments_stu", { designation: "student", assignments: foundAssignments, curUser: student });
-        }
-    });
+                res.render("assignments_stu", { designation: "student", assignments: foundAssignments, curUser: student });
+            }
+        });
+    } else {
+        res.redirect("/student");
+    }
 });
 app.get("/teacher/assignments/view/:id", async(req, res) => {
-    const student = req.query.student;
-    const submission = await Submission.findOne({ assignmentId: req.params.id, studentId: student });
-    if (submission) {
-        res.redirect(`/${submission.fileName}`)
+    if (req.isAuthenticated()) {
+        const student = req.query.student;
+        const submission = await Submission.findOne({ assignmentId: req.params.id, studentId: student });
+        if (submission) {
+            res.redirect(`/${submission.fileName}`)
+        } else {
+            alert("User has not submitted");
+        }
     } else {
-        alert("User has not submitted");
+        res.redirect("/teacher");
     }
 });
 
 app.get("/student/Educafe/assignments/view/:id", async(req, res) => {
-    const student = req.user;
-    const submission = await Submission.findOne({ assignmentId: req.params.id, studentId: student._id });
-    const obj = submission;
+    if (req.isAuthenticated()) {
+        const student = req.user;
+        const submission = await Submission.findOne({ assignmentId: req.params.id, studentId: student._id });
+        const obj = submission;
 
-    Assignment.findById(req.params.id, (err, foundAssignment) => {
-        res.render("view_assignment_stu", { designation: "student", assignment: foundAssignment, curUser: student, submission: submission });
-    });
+        Assignment.findById(req.params.id, (err, foundAssignment) => {
+            res.render("view_assignment_stu", { designation: "student", assignment: foundAssignment, curUser: student, submission: submission });
+        });
+    } else {
+        res.redirect("/student");
+    }
 });
-
 
 app.post("/api/uploadFile", upload.single("myFile"), async(req, res) => {
     const student = req.user;
@@ -564,27 +575,39 @@ app.get("/api/getFiles", async(req, res) => {
 });
 
 app.get("/teacher/Educafe/assignments", (req, res) => {
+    if (req.isAuthenticated()) {
+        const teacherId = req.user._id;
+        Assignment.find({ teacherId: teacherId }, (err, foundAssignments) => {
+            if (err) {
+                console.log(err);
+            } else {
+                res.render("assignments_teach", { designation: "teacher", assignments: foundAssignments });
+            }
+        });
+    } else {
+        res.redirect("/teacher");
+    }
 
-    const teacherId = req.user._id;
-    Assignment.find({ teacherId: teacherId }, (err, foundAssignments) => {
-        if (err) {
-            console.log(err);
-        } else {
-            res.render("assignments_teach", { designation: "teacher", assignments: foundAssignments });
-        }
-    });
 });
 
 app.get("/teacher/Educafe/assignments/new", (req, res) => {
-    const nt = req.user._id;
-    res.render("assignment_new", { designation: "teacher" });
+    if (req.isAuthenticated()) {
+        const nt = req.user._id;
+        res.render("assignment_new", { designation: "teacher" });
+    } else {
+        res.redirect("/teacher");
+    }
 });
 
 app.get("/teacher/Educafe/assignments/view/:id", async(req, res) => {
-    const teacher = req.user;
-    Assignment.findById(req.params.id, (err, foundAssignment) => {
-        res.render("view_assignment_teacher", { designation: "teacher", assignment: foundAssignment, curUser: teacher });
-    });
+    if (req.isAuthenticated()) {
+        const teacher = req.user;
+        Assignment.findById(req.params.id, (err, foundAssignment) => {
+            res.render("view_assignment_teacher", { designation: "teacher", assignment: foundAssignment, curUser: teacher });
+        });
+    } else {
+        res.redirect("/teacher");
+    }
 });
 
 app.get("/student/Educafe/polls/view/:id", function(req, res) {
@@ -647,8 +670,12 @@ app.get("/teacher/EduCafe/polls/view/:id", function(req, res) {
 });
 
 app.get("/teacher/EduCafe/polls/new", function(req, res) {
-    const Id = req.user._id;
-    res.render("poll_new", { designation: "teacher" });
+    if (req.isAuthenticated()) {
+        const Id = req.user._id;
+        res.render("poll_new", { designation: "teacher" });
+    } else {
+        res.redirect("/teacher");
+    }
 });
 app.post("/teacher/EduCafe/polls/new", function(req, res) {
     const Ttime = new Date().getTime();

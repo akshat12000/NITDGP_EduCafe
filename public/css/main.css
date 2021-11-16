@@ -367,3 +367,15 @@ li {
     width: 2vw;
     margin-top: 4.5%;
 }
+
+.atten-table {
+    border-collapse: collapse;
+    /* border: 1px solid #333; */
+}
+
+.atten-table td,
+.atten-table tr,
+.atten-table th {
+    border: 1px solid #333;
+    width: 8vw;
+}

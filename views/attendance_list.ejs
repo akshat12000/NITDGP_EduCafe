@@ -1,8 +1,24 @@
 <%- include("partials/headerMain.ejs"); -%>
-    <% attendancelist.forEach(function( eachPerson){ %>
-        <li>Name:
-            <%= eachPerson.name %> <br> Roll:
-                <%= eachPerson.roll %>
-        </li>
-        <% }) %>
-            <%- include("partials/footerMain.ejs"); -%>
+    <h1 style="text-align:center;margin-bottom:2%; margin-top:2%;">Attendance <span style="color:#8a658f">List</span> </h1>
+    <hr><br>
+    <div class="assignment-container">
+        <table style="margin:auto;" class="atten-table">
+            <thead>
+                <th>Name</th>
+                <th>Roll No</th>
+            </thead>
+            <tbody style="text-align: center;">
+                <% attendancelist.forEach(function( eachPerson){ %>
+                    <tr>
+                        <td style="padding: 1%; width: 60%;">
+                            <%= eachPerson.name %>
+                        </td>
+                        <td style="padding: 1%; width:60%;">
+                            <%= eachPerson.roll %>
+                        </td>
+                        <% }) %>
+                    </tr>
+            </tbody>
+        </table>
+    </div>
+    <%- include("partials/footerMain.ejs"); -%>
