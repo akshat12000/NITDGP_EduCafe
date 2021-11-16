@@ -60,7 +60,7 @@
 
                 </div>
                 <div class="assignment-container">
-                    <%polls.forEach((item)=>{ %>
+                    <%polls.map((item,index)=>{ %>
                         <div class="assignment-card-container" style="width: 18rem; margin:2%">
                             <div class="card-header">
                                 <strong>Teacher Name:</strong>
@@ -74,9 +74,16 @@
                                     <%=item.year%>
                                 </li>
                             </ul>
-                            <form action="/student/Educafe/polls/view/<%=item._id%>" method="get">
-                                <button type="submit" style="margin:auto;" id="reg-btn">View Poll</button>
-                            </form>
+                            <% if(!responded[index]){%>
+                                <form action="/student/Educafe/polls/view/<%=item._id%>" method="get">
+                                    <button type="submit" style="margin:auto;" id="reg-btn">View Poll</button>
+                                </form>
+                                <%}%>
+                                    <% if(responded[index]){%>
+                                        <form action="/student/Educafe/polls/view/<%=item._id%>" method="get">
+                                            <button type="submit" style="margin:auto;" id="reg-btn">View Response</button>
+                                        </form>
+                                        <%}%>
                         </div>
                         <% }); %>
                 </div>

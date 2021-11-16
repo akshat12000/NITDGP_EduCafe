@@ -613,7 +613,20 @@ app.get("/teacher/Educafe/assignments/view/:id", async(req, res) => {
 app.get("/student/Educafe/polls/view/:id", function(req, res) {
     if (req.isAuthenticated()) {
         Poll.findById(req.params.id, function(err, foundPoll) {
-            res.render("view_poll_student", { designation: "student", poll: foundPoll });
+            const sId = req.user._id;
+            var pid = "";
+            var responded = [];
+            if (foundPoll.option1.response.includes(sId) || foundPoll.option2.response.includes(sId)) {
+                responded = true;
+                if (foundPoll.option1.response.includes(sId)) {
+                    pid = foundPoll.option1.val;
+                } else {
+                    pid = foundPoll.option2.val;
+                }
+            } else {
+                responded = false;
+            }
+            res.render("view_poll_student", { designation: "student", poll: foundPoll, responded: responded, ans: pid });
         });
     } else {
         res.redirect("/student");
@@ -649,8 +662,16 @@ app.get("/student/EduCafe/polls", function(req, res) {
             if (err) {
                 console.log(err);
             } else {
-
-                res.render("polls_stu", { designation: "student", polls: foundPolls, curUser: student });
+                const sId = student._id;
+                var responded = [];
+                for (var i = 0; i < foundPolls.length; i++) {
+                    if (foundPolls[i].option1.response.includes(sId) || foundPolls[i].option2.response.includes(sId)) {
+                        responded.push(true);
+                    } else {
+                        responded.push(false);
+                    }
+                }
+                res.render("polls_stu", { designation: "student", polls: foundPolls, curUser: student, responded: responded });
             }
         });
     } else {

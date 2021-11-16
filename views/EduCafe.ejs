@@ -78,7 +78,7 @@
                                         <%=item.time%>
                                     </div>
                                     <div class="class-flex-card">
-                                        <div class="flex-card-sister">
+                                        <div class="flex-card-sister" style="flex: 85%;">
                                             <p style="color: crimson;"><i class="fa fa-video-camera"></i> Live Class</p>
                                             <h4>
                                                 <%=item.name%> Lecture</h4>
@@ -86,7 +86,7 @@
                                                 <%=item.teacherName%>
                                             </span>
                                         </div>
-                                        <div class="flex-card-brother">
+                                        <div class="flex-card-brother" style="flex:5%; display:block;">
                                             <form action="/class" method="POST">
                                                 <button id="reg-btn" type="submit" value=<%=[item.meetlink, sid]%> name="atnBtn">Join Now</button>
                                             </form>
