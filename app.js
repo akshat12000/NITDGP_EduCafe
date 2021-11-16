@@ -7,6 +7,7 @@ const mongoose = require("mongoose");
 const session = require("express-session");
 const findOrCreate = require("mongoose-findorcreate");
 const passport = require("passport");
+const nodemailer = require("nodemailer");
 const authStudent = new passport.Passport();
 const authTeacher = new passport.Passport();
 const passportLocalMongoose = require("passport-local-mongoose");
@@ -350,6 +351,71 @@ app.post("/teacher/EduCafe/delete", function (req, res) {
             res.redirect("/teacher/EduCafe");
         }
     });
+});
+
+app.get("/teacher/Educafe/send-notification", (req, res) => {
+    // if (req.user.type != "teacher") {
+    //     res.redirect('/');
+    // } else {
+    res.render('send_notif', { designation: "teacher" });
+    // }
+});
+
+app.post("/teacher/Educafe/send-notification", async (req, res, next) => {
+    // const email = req.body.email;
+    const testAccount  = await nodemailer.createTestAccount();
+    const recipientSubject = req.body.recipientSubject;
+    const recipientYear = req.body.recipientYear;
+    const subject = req.body.subjectName;
+    const bodyOfEmail = req.body.bodyOfEmail;
+
+    // create reusable transporter object using the default SMTP transport
+    // let transporter = nodemailer.createTransport({
+    //     host: "smtp.ethereal.email",
+    //     port: 587,
+    //     secure: false, // true for 465, false for other ports
+    //     auth: {
+    //     user: testAccount.user, // generated ethereal user
+    //     pass: testAccount.pass, // generated ethereal password
+    //     },
+    // });
+    let transporter = nodemailer.createTransport({
+        service: "FastMail",
+        auth: {
+        user: "nitdgpcafe@fastmail.com", // generated ethereal user
+        pass: "7fbkcmphtjaz3f9a", // generated ethereal password
+        },
+    });
+
+    let receiverList = [];
+
+    await Student.find({year: recipientYear, subjects: { $in: subject }}).then((students) => {
+        if (students) {
+            students.forEach((student) => {
+                receiverList.push(student.username);
+                console.log(student);
+            })
+        } else {
+            console.log("No students found!");
+            res.redirect('/teacher/Educafe/send-notification');
+            next();
+        }
+    }).catch((err) => {
+        console.log(err);
+    })
+    console.log(receiverList);
+    const emailList = receiverList.join([separator = ', ']);
+    console.log(emailList);
+
+    // send mail with defined transport object
+    let info = await transporter.sendMail({
+        from: `nitdgpcafe@fastmail.com`, // sender address
+        to: emailList, // list of receivers
+        subject: recipientSubject, // Subject line
+        text: `From: ${req.user.name} Mail: ${bodyOfEmail}`, // plain text body
+        // html: "<b>Hello world?</b>", // html body
+    });
+    res.redirect("/teacher/Educafe/send-notification");
 });
 
 app.get("/teacher/EduCafe/schedule", function (req, res) {
