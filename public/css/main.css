@@ -281,11 +281,16 @@ li {
 }
 
 .flex-card-sister {
-    flex: 85%;
+    flex: 70%;
 }
 
 .flex-card-brother {
-    flex: 5%;
+    flex: 35%;
+    display: flex;
+}
+
+.flex-card-brother form {
+    margin: 1% 2%;
 }
 
 .assignment-form {
