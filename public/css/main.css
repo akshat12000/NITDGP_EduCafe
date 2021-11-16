@@ -384,3 +384,8 @@ li {
     border: 1px solid #333;
     width: 8vw;
 }
+
+.p-menu {
+    margin-right: 6%;
+    margin-left: -15%;
+}

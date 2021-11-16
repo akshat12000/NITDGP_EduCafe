@@ -31,15 +31,18 @@ const store = new MongoDBStore({
     collection: 'mySessions',
 
     connectionOptions: {
-        useNewUrlParser: true, 
-        useUnifiedTopology: true, ssl: true, sslValidate: true, sslCA: process.env.CERTI_FILE
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
+        ssl: true,
+        sslValidate: true,
+        sslCA: process.env.CERTI_FILE
     }
-  });
-  store.on('error', function(error) {
+});
+store.on('error', function(error) {
     console.log(error);
-  });
+});
 
-  
+
 
 app.use(session({
     secret: process.env.SECRET,
@@ -368,9 +371,9 @@ app.get("/teacher/Educafe/send-notification", (req, res) => {
     // }
 });
 
-app.post("/teacher/Educafe/send-notification", async (req, res, next) => {
+app.post("/teacher/Educafe/send-notification", async(req, res, next) => {
     // const email = req.body.email;
-    const testAccount  = await nodemailer.createTestAccount();
+    const testAccount = await nodemailer.createTestAccount();
     const recipientSubject = req.body.recipientSubject;
     const recipientYear = req.body.recipientYear;
     const subject = req.body.subjectName;
@@ -387,16 +390,16 @@ app.post("/teacher/Educafe/send-notification", async (req, res, next) => {
     //     },
     // });
     let transporter = nodemailer.createTransport({
-        service: "FastMail",
+        service: "gmail",
         auth: {
-        user: "nitdgpcafe@fastmail.com", // generated ethereal user
-        pass: "7fbkcmphtjaz3f9a", // generated ethereal password
+            user: "ibmhack2021@gmail.com", // generated ethereal user
+            pass: "wawlwbhdebysaacv", // generated ethereal password
         },
     });
 
     let receiverList = [];
 
-    await Student.find({year: recipientYear, subjects: { $in: subject }}).then((students) => {
+    await Student.find({ year: recipientYear, subjects: { $in: subject } }).then((students) => {
         if (students) {
             students.forEach((student) => {
                 receiverList.push(student.username);
@@ -416,7 +419,7 @@ app.post("/teacher/Educafe/send-notification", async (req, res, next) => {
 
     // send mail with defined transport object
     let info = await transporter.sendMail({
-        from: `nitdgpcafe@fastmail.com`, // sender address
+        from: "ibmhack2021@gmail.com", // sender address
         to: emailList, // list of receivers
         subject: recipientSubject, // Subject line
         text: `From: ${req.user.name} Mail: ${bodyOfEmail}`, // plain text body
@@ -425,7 +428,7 @@ app.post("/teacher/Educafe/send-notification", async (req, res, next) => {
     res.redirect("/teacher/Educafe/send-notification");
 });
 
-app.get("/teacher/EduCafe/schedule", function (req, res) {
+app.get("/teacher/EduCafe/schedule", function(req, res) {
     res.render("schedule_class", { designation: "teacher" });
 });
 
