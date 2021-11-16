@@ -15,47 +15,25 @@
                 <div class="nav-items">
                     <% if(designation==="student"){%>
                         <ul>
-                            <li>
-                                <a href="/student/EduCafe/overview"><i class="fa fa-bar-chart-o menu"></i>Overview</a
-            >
-          </li>
-                            <li>
-                                <a href="/student/EduCafe"><i class="fa fa-calendar menu"></i> Schedule</a
-            >
-          </li>
-          <li>
-            <a href="#"><i class="fa fa-book menu"></i>Materials</a>
-                            </li>
-                            <li class="menu-ex">
-                                <a href="/student/EduCafe/assignments"><i class="fa fa-bookmark-o menu-ex-li"></i>Assignments</a
-            >
-          </li>
-        </ul>
-        <%}%> <% if(designation==="teacher"){%>
-        <ul>
-          <li>
-            <a href="/teacher/EduCafe/overview"
-              ><i class="fa fa-bar-chart-o menu"></i>Overview</a
-            >
-          </li>
-          <li>
-            <a href="/teacher/EduCafe"
-              ><i class="fa fa-calendar menu"></i> Schedule</a
-            >
-          </li>
-          <li class="menu-ex">
-            <a href="/teacher/EduCafe/assignments"
-              ><i class="fa fa-bookmark-o menu-ex-li"></i>Assignments</a
-            >
-          </li>
-        </ul>
-        <%}%>
-      </div>
-      <!--- Log out Option --->
-      <div class="nav-log-out">
-        <% if(designation==="student"){%>
-        <a href="/student/logout"
-          ><i class="fa fa-sign-out log-li"></i>Log out</a
+                            <li><a href="/student/EduCafe/overview"><i class="fa fa-info menu"></i>Overview</a></li>
+                            <li><a href="/student/EduCafe"><i class="fa fa-calendar menu"></i> Schedule</a></li>
+                            <li><a href="/student/EduCafe/polls"><i class="fa fa-bar-chart-o menu p-menu"></i>Polls</a></li>
+                            <li class="menu-ex"><a href="/student/EduCafe/assignments"><i class="fa fa-bookmark-o menu-ex-li"></i>Assignments</a></li>
+                        </ul>
+                        <%}%>
+                            <% if(designation==="teacher"){%>
+                                <ul>
+                                    <li><a href="/teacher/EduCafe/overview"><i class="fa fa-info menu"></i>Overview</a></li>
+                                    <li><a href="/teacher/EduCafe"><i class="fa fa-calendar menu"></i> Schedule</a></li>
+                                    <li><a href="/teacher/EduCafe/polls"><i class="fa fa-bar-chart-o menu p-menu"></i>Polls</a></li>
+                                    <li class="menu-ex"><a href="/teacher/EduCafe/assignments"><i class="fa fa-bookmark-o menu-ex-li"></i>Assignments</a></li>
+                                </ul>
+                                <%}%>
+                </div>
+                <!--- Log out Option --->
+                <div class="nav-log-out">
+                    <% if(designation==="student"){%>
+                        <a href="/student/logout"><i class="fa fa-sign-out log-li"></i>Log out</a
         >
         <%}%> <% if(designation==="teacher"){%>
         <a href="/teacher/logout"
@@ -90,7 +68,7 @@
         <!--- Notification and User Icons --->
         <div class="user-disp">
           <a href="#" class="fa fa-bell-o bell-icon"></a>&nbsp;&nbsp&nbsp;
-                                <a href="#" class="fa fa-user-circle user-icon"></a>
+                        <a href="#" class="fa fa-user-circle user-icon"></a>
                 </div>
             </div>
             <form class="assignment-form" action="/teacher/EduCafe/polls/new" method="POST">
