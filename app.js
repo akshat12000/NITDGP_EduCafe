@@ -25,10 +25,26 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(express.static("public"));
 
+const store = new MongoDBStore({
+    uri: 'mongodb://' + process.env.DB_USERNAME + ':' + process.env.DB_PASSWORD + '@dbaas253.hyperp-dbaas.cloud.ibm.com:30055,dbaas254.hyperp-dbaas.cloud.ibm.com:30906,dbaas255.hyperp-dbaas.cloud.ibm.com:30666/admin?replicaSet=IBM',
+    collection: 'mySessions',
+
+    connectionOptions: {
+        useNewUrlParser: true, 
+        useUnifiedTopology: true, ssl: true, sslValidate: true, sslCA: process.env.CERTI_FILE
+    }
+  });
+  store.on('error', function(error) {
+    console.log(error);
+  });
+
+  
+
 app.use(session({
     secret: process.env.SECRET,
-    resave: false,
-    saveUninitialized: false,
+    resave: true,
+    saveUninitialized: true,
+    store: store
 }));
 
 app.use(authStudent.initialize());
