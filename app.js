@@ -390,10 +390,10 @@ app.post("/teacher/Educafe/send-notification", async(req, res, next) => {
     //     },
     // });
     let transporter = nodemailer.createTransport({
-        service: "gmail",
+        service: "FastMail",
         auth: {
-            user: "ibmhack2021@gmail.com", // generated ethereal user
-            pass: "wawlwbhdebysaacv", // generated ethereal password
+            user: "nitdgpcafe@fastmail.com", // generated ethereal user
+            pass: "7fbkcmphtjaz3f9a", // generated ethereal password
         },
     });
 
@@ -419,10 +419,10 @@ app.post("/teacher/Educafe/send-notification", async(req, res, next) => {
 
     // send mail with defined transport object
     let info = await transporter.sendMail({
-        from: "ibmhack2021@gmail.com", // sender address
-        to: emailList, // list of receivers
+        from: "nitdgpcafe@fastmail.com", // sender address
+        to: receiverList, // list of receivers
         subject: recipientSubject, // Subject line
-        text: `From: ${req.user.name} Mail: ${bodyOfEmail}`, // plain text body
+        text: `From: ${req.user.name}\n\nMail: ${bodyOfEmail}`, // plain text body
         // html: "<b>Hello world?</b>", // html body
     });
     res.redirect("/teacher/Educafe/send-notification");
