@@ -392,8 +392,8 @@ app.post("/teacher/Educafe/send-notification", async(req, res, next) => {
     let transporter = nodemailer.createTransport({
         service: "FastMail",
         auth: {
-            user: "nitdgpcafe@fastmail.com", // generated ethereal user
-            pass: "7fbkcmphtjaz3f9a", // generated ethereal password
+            user: process.env.EMAIL_USER, // generated ethereal user
+            pass: process.env.EMAIL_PASS, // generated ethereal password
         },
     });
 
@@ -815,6 +815,6 @@ app.get("/teacher/EduCafe/polls", function(req, res) {
     }
 });
 
-app.listen('3000', function(req, res) {
+app.listen(process.env.PORT|| 3000, function(req, res) {
     console.log("Started at port 3000");
 });
